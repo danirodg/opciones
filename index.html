@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1116">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bull Put">
+<title>Bull Put</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1116;--card:#161A21;--line:#222833;--line2:#2A313D;
+  --tx:#E8ECF2;--tx2:#C3CAD5;--mut:#8B95A5;--acc:#7FB2FF;
+  --ok:#5BE09A;--okbg:#173A28;--wa:#FFC53D;--wabg:#3D2F0E;
+  --ko:#FF8A8E;--kobg:#3F1719;--nabg:#1E232C
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:480px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 16px 110px;display:flex;flex-direction:column;gap:18px}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+h1{margin:0;font-size:26px;font-weight:700}
+h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.col{display:flex;flex-direction:column;gap:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:26px;border-radius:13px;padding:0 10px;font-size:12px;font-weight:500;display:inline-flex;align-items:center}
+.s-ok{background:var(--okbg);color:var(--ok)}
+.s-warn{background:var(--wabg);color:var(--wa)}
+.s-fail{background:var(--kobg);color:var(--ko)}
+.s-na{background:var(--nabg);color:var(--mut)}
+.tk{width:100%;text-align:left;cursor:pointer;color:inherit;font:inherit;display:flex;flex-direction:column;gap:10px}
+.note{font-size:12px;color:var(--mut);line-height:1.4}
+.sum{border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;color:var(--mut)}
+input{height:44px;width:100%;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--tx);padding:0 12px;font-size:16px;font-family:'IBM Plex Mono',monospace;-webkit-appearance:none;appearance:none}
+input[type=date]{display:block;min-width:0;line-height:44px}
+.auto{height:44px;border-radius:10px;border:1px dashed var(--line2);color:var(--mut);padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:15px;display:flex;align-items:center}
+.pill{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--tx2);font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;cursor:pointer}
+.pill.on{border:1.5px solid var(--acc);background:#1B2A44;color:#fff;font-weight:600}
+.btn{height:52px;border-radius:14px;border:none;font:inherit;font-size:16px;font-weight:700;width:100%;cursor:pointer}
+.btn.pri{background:var(--acc);color:#0B1220}
+.btn.sec{background:var(--card);border:1px solid var(--line2);color:var(--tx);font-weight:600}
+.ibtn{width:44px;height:44px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(11,14,18,.96);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{flex:1;max-width:160px;height:58px;background:none;border:none;color:var(--mut);font:inherit;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.tabs button.on{color:var(--acc)}
+.lights{background:#07090C;border-radius:22px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.light{width:32px;height:32px;border-radius:16px;background:#22272F}
+.rule{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--line);padding:6px 0}
+.rule:last-child{border-bottom:none}
+.dot{width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.stat .v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600}
+.lab{font-size:12px;color:var(--mut)}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#1B2A44;color:#fff;border:1px solid var(--acc);padding:10px 16px;border-radius:12px;font-size:14px}
+.center{text-align:center;color:var(--mut);padding:40px 0}
+.logo{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#F2F4F7;overflow:hidden;flex-shrink:0;color:#0E1116;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.logo img{width:70%;height:70%;object-fit:contain}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const TICKS = ['IWM', 'SPY', 'QQQ', 'AAPL', 'NVDA', 'INTC'];
+const ACCIONES = ['AAPL', 'NVDA', 'INTC']; // piden fecha de earnings
+const CFG0 = {
+  dist: { IWM: 3, SPY: 3, QQQ: 3, AAPL: 3, NVDA: 5, INTC: 5 },
+  credIdx: 1.00, credGro: 1.15, ivrMin: 25, maxPos: 4, pos: 0, ancho: 5,
+  url: '', clave: ''
+};
+// Logos: icono del sitio web de cada emisor/empresa, cargado al vuelo
+const DOMINIOS = { IWM: 'ishares.com', SPY: 'ssga.com', QQQ: 'invesco.com', AAPL: 'apple.com', NVDA: 'nvidia.com', INTC: 'intel.com' };
+function logo(t, px) {
+  return `<span class="logo" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.45)}px"><img alt="" src="https://www.google.com/s2/favicons?domain=${DOMINIOS[t]}&sz=128" onerror="this.parentNode.textContent='${t[0]}'"></span>`;
+}
+const st = {
+  datos: null, cfg: JSON.parse(JSON.stringify(CFG0)),
+  vista: 'radar', f: { t: 'QQQ' }, res: null, cargando: true, error: ''
+};
+
+// ---------- utilidades ----------
+const num = v => (v === undefined || v === null || v === '') ? NaN : parseFloat(String(v).replace(',', '.'));
+const f2 = (x, d = 2) => isFinite(x) ? x.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
+const pct = (x, d = 1) => isFinite(x) ? f2(x * 100, d) + ' %' : '—';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const U = t => st.datos && st.datos.subyacentes.find(u => u.ticker === t);
+function ncdf(x) {
+  const t = 1 / (1 + 0.2316419 * Math.abs(x));
+  const d = 0.3989422804 * Math.exp(-x * x / 2);
+  const p = d * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+  return x > 0 ? 1 - p : p;
+}
+const ICON = {
+  ok: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v8M12 18.5v.5"/></svg>',
+  fail: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+  na: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 12h10"/></svg>',
+  chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  back: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  reload: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>',
+  radar: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></svg>',
+  check: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 5-5"/></svg>',
+  gear: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
+};
+
+// ---------- carga ----------
+function leerLocal(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+function escribirLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+function cargarCfg() {
+  const c = leerLocal('bp_cfg');
+  if (c) st.cfg = Object.assign({}, CFG0, c, { dist: Object.assign({}, CFG0.dist, c.dist || {}) });
+}
+function cargar() {
+  if (!st.cfg.url || !st.cfg.clave) { st.cargando = false; st.vista = 'ajustes'; render(); return; }
+  st.cargando = true; st.error = ''; render();
+  const base = st.cfg.url.trim();
+  const u = base + (base.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(st.cfg.clave.trim());
+  fetch(u)
+    .then(r => r.json())
+    .then(d => {
+      if (d.error) throw new Error(d.error === 'clave incorrecta' ? 'Clave incorrecta' : d.error);
+      st.datos = d; escribirLocal('bp_datos', d);
+    })
+    .catch(e => {
+      st.error = e.message || String(e);
+      const c = leerLocal('bp_datos');
+      if (c && !st.datos) { st.datos = c; toast('Sin conexión: datos guardados'); }
+      else if (st.datos) toast('No se pudo actualizar');
+    })
+    .finally(() => { st.cargando = false; render(); });
+}
+function guardarCfg(msg) {
+  toast(escribirLocal('bp_cfg', st.cfg) ? (msg || 'Guardado') : 'No se pudo guardar');
+}
+function guardarYCargar() { guardarCfg('Guardado'); st.vista = 'radar'; cargar(); }
+function setTxt(path, v) { st.cfg[path] = v.trim(); }
+function toast(m) {
+  const d = document.createElement('div'); d.className = 'toast'; d.textContent = m;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 2200);
+}
+
+// ---------- reglas ----------
+function zona(u) {
+  const lo = Math.min(u.mm21, u.mm52);
+  let hi = Math.min(Math.max(u.mm21, u.mm52), u.precio * (1 - st.cfg.dist[u.ticker] / 100));
+  if (u.ticker === 'INTC') hi = Math.min(hi, u.mm52semanas);
+  return hi > lo ? { lo, hi } : null;
+}
+function clasificar(u) {
+  const ch = [], notas = []; let fail = false, warn = false;
+  if (u.tendencia === 'FALLO') { ch.push(['Bajo MM52', 'fail']); fail = true; notas.push('Precio ' + f2(u.precio) + ' bajo MM52 ' + f2(u.mm52)); }
+  else if (u.tendencia === 'AVISO') { ch.push(['Bajo MM21', 'warn']); warn = true; }
+  else ch.push(['Tendencia', 'ok']);
+  if (u.estocasticoOK) ch.push(['Estocástico ↑', 'ok']);
+  else { ch.push(['Estocástico', 'warn']); warn = true; notas.push('Esperando cruce al alza del estocástico'); }
+  if (u.ticker === 'NVDA') {
+    if (u.pullbackOK) ch.push(['Pullback ' + pct(u.retroceso), 'ok']);
+    else { ch.push(['Sin pullback', 'warn']); warn = true; notas.push('Retroceso ' + pct(u.retroceso) + ' (mín. 5 %)'); }
+  }
+  const z = zona(u);
+  if (!z) {
+    ch.push(['Sin zona strike', 'fail']); fail = true;
+    notas.push('Con distancia mín. ' + f2(st.cfg.dist[u.ticker], 0) + ' % no cabe strike entre MM21 y MM52' + (u.ticker === 'INTC' ? ' y bajo la MM de 52 semanas' : ''));
+  } else if ((z.hi - z.lo) / u.precio < 0.005) {
+    ch.push(['Zona estrecha', 'warn']); warn = true;
+  } else ch.push(['Zona strike', 'ok']);
+  return { estado: fail ? 'rojo' : warn ? 'amarillo' : 'verde', ch, notas, z };
+}
+
+// ---------- vistas ----------
+function vRadar() {
+  if (!st.datos) return '';
+  const items = TICKS.map(U).filter(Boolean).map(u => ({ u, c: clasificar(u) }));
+  const grupos = [
+    ['verde', 'Candidatos', 'var(--ok)', '#11241A', '#1F4A33'],
+    ['amarillo', 'Vigilar', 'var(--wa)', '#251E0C', '#4A3B12'],
+    ['rojo', 'Descartados', 'var(--ko)', '#2A1214', '#4F2226']
+  ];
+  const cierre = new Date(st.datos.subyacentes[0].ultimoCierre);
+  let h = `<div class="row" style="align-items:flex-end">
+    <div class="col"><div class="eyebrow">Cierre del ${cierre.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</div><h1>Radar</h1></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="col" style="align-items:flex-end"><div class="lab">Posiciones</div><div class="mono" style="font-size:20px;font-weight:600">${st.cfg.pos}<span style="color:#5C6676">/${st.cfg.maxPos}</span></div></div>
+      <button class="ibtn" aria-label="Actualizar" onclick="cargar()">${ICON.reload}</button>
+    </div></div>`;
+  h += '<div class="grid3">' + grupos.map(g => `<div class="sum" style="background:${g[3]};border:1px solid ${g[4]}">
+      <div class="mono" style="font-size:22px;font-weight:600;color:${g[2]}">${items.filter(i => i.c.estado === g[0]).length}</div>
+      <div style="font-size:12px;color:var(--tx2)">${g[1]}</div></div>`).join('') + '</div>';
+  grupos.forEach(g => {
+    const its = items.filter(i => i.c.estado === g[0]);
+    if (!its.length) return;
+    h += `<div style="display:flex;flex-direction:column;gap:10px"><h2 style="color:${g[2]}">${g[1]}</h2>`;
+    its.forEach(({ u, c }) => {
+      h += `<button class="card tk" onclick="abrir('${u.ticker}')">
+        <div class="row" style="width:100%">
+          <div style="display:flex;align-items:center;gap:10px">${logo(u.ticker, 32)}<span class="mono" style="font-size:18px;font-weight:600">${u.ticker}</span><span class="mono" style="font-size:14px;color:var(--mut)">${f2(u.precio)}</span></div>
+          <div style="display:flex;align-items:center;gap:6px;color:#5C6676"><span style="font-size:12px;color:var(--mut)">${c.z ? 'Zona ' + f2(c.z.lo, 1) + ' – ' + f2(c.z.hi, 1) : 'Sin zona'}</span>${ICON.chev}</div>
+        </div>
+        <div class="chips">${c.ch.map(x => `<span class="chip s-${x[1]}">${esc(x[0])}</span>`).join('')}</div>
+        ${c.notas.length ? `<div class="note">${c.notas.map(esc).join(' · ')}</div>` : ''}
+      </button>`;
+    });
+    h += '</div>';
+  });
+  return h;
+}
+
+function campo(id, lab, val, extra) {
+  return `<div class="field"><label for="${id}">${lab}</label>
+    <input id="${id}" ${extra || 'inputmode="decimal"'} value="${esc(val || '')}" oninput="st.f['${id}']=this.value;updAuto()"></div>`;
+}
+function updAuto() {
+  const u = U(st.f.t), K = num(st.f.strike);
+  const a = document.getElementById('auto_comp'), b = document.getElementById('auto_dist');
+  if (a) a.textContent = (isFinite(K) ? f2(K - st.cfg.ancho, 1) : '—') + ' · auto';
+  if (b && u) b.textContent = isFinite(K) ? pct((u.precio - K) / u.precio) : '—';
+}
+function vValidar() {
+  if (!st.datos) return '';
+  const t = st.f.t, u = U(t), c = clasificar(u);
+  const tipoTxt = u.tipo === 'Índice' ? 'Reglas de índice · crédito mín. $' + f2(st.cfg.credIdx) : 'Reglas growth · crédito mín. $' + f2(st.cfg.credGro);
+  const stK = num(st.f.strike);
+  const distTxt = isFinite(stK) ? pct((u.precio - stK) / u.precio) : '—';
+  let h = `<div class="row">
+    <div class="col"><div class="eyebrow">Bull Put · Spread $${st.cfg.ancho}</div><h1>Nueva operación</h1></div>
+    <div class="col" style="align-items:flex-end"><div class="lab">Posiciones</div><div class="mono" style="font-size:20px;font-weight:600">${st.cfg.pos}<span style="color:#5C6676">/${st.cfg.maxPos}</span></div></div></div>`;
+  h += `<div style="display:flex;flex-direction:column;gap:10px"><div class="lab" style="font-size:13px;font-weight:500">Subyacente</div>
+    <div class="grid3">${TICKS.map(x => `<button class="pill ${x === t ? 'on' : ''}" onclick="selT('${x}')">${logo(x, 20)}${x}</button>`).join('')}</div>
+    <div class="note">${tipoTxt}</div></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+    <div class="row"><span style="font-size:13px;font-weight:600;color:var(--tx2)">Datos automáticos</span><span class="mono" style="font-size:13px;color:var(--mut)">${f2(u.precio)}</span></div>
+    <div class="grid2" style="gap:8px">
+      <div class="col"><span class="lab">MM21</span><span class="mono">${f2(u.mm21)}</span></div>
+      <div class="col"><span class="lab">MM52</span><span class="mono">${f2(u.mm52)}</span></div>
+      <div class="col"><span class="lab">%K / %D</span><span class="mono">${f2(u.k, 0)} / ${f2(u.d, 0)}</span></div>
+      <div class="col"><span class="lab">Zona strike</span><span class="mono">${c.z ? f2(c.z.lo, 1) + '–' + f2(c.z.hi, 1) : 'Ninguna'}</span></div>
+      ${t === 'INTC' ? `<div class="col"><span class="lab">MM 52 semanas</span><span class="mono">${f2(u.mm52semanas)}</span></div>` : ''}
+      ${t === 'NVDA' ? `<div class="col"><span class="lab">Retroceso</span><span class="mono">${pct(u.retroceso)}</span></div>` : ''}
+    </div>
+    <div class="chips">${c.ch.map(x => `<span class="chip s-${x[1]}">${esc(x[0])}</span>`).join('')}</div></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Spread</div>
+    <div class="grid2">
+      ${campo('venc', 'Vencimiento', st.f.venc, 'type="date"')}
+      ${campo('strike', 'Strike vendido', st.f.strike)}
+      <div class="field"><span class="lab">Strike comprado</span><div class="auto" id="auto_comp">${isFinite(stK) ? f2(stK - st.cfg.ancho, 1) : '—'} · auto</div></div>
+      <div class="field"><span class="lab">Distancia</span><div class="auto" id="auto_dist">${distTxt}</div></div>
+      ${campo('credito', 'Crédito ($)', st.f.credito)}
+      ${campo('iv', 'IV (%)', st.f.iv)}
+    </div></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Datos manuales</div>
+    <div class="grid2">
+      ${campo('ivr', 'IVR', st.f.ivr)}
+      ${campo('putwall', 'Put wall (OI venc.)', st.f.putwall)}
+      ${ACCIONES.includes(t) ? campo('earn', 'Earnings', st.f.earn, 'type="date"') : ''}
+    </div></div>`;
+  h += `<button class="btn pri" onclick="validar()">Validar operación</button>`;
+  return h;
+}
+
+function validar() {
+  ['venc', 'strike', 'credito', 'iv', 'ivr', 'putwall', 'earn'].forEach(id => { const e = document.getElementById(id); if (e) st.f[id] = e.value; });
+  const t = st.f.t, u = U(t), c = st.cfg, S = u.precio;
+  const K = num(st.f.strike), cr = num(st.f.credito), iv = num(st.f.iv) / 100, ivr = num(st.f.ivr), pw = num(st.f.putwall);
+  const venc = st.f.venc ? new Date(st.f.venc + 'T16:00:00') : null;
+  if (!isFinite(K) || !isFinite(cr) || !venc) { toast('Rellena vencimiento, strike y crédito'); return; }
+  const dias = Math.max(1, Math.round((venc - new Date()) / 864e5));
+  const R = [];
+  const add = (name, note, value, s) => R.push({ name, note, value, s });
+
+  add('Tendencia', 'Precio frente a MM52 y MM21',
+    u.tendencia === 'OK' ? 'OK' : u.tendencia === 'AVISO' ? 'Bajo MM21' : 'Bajo MM52',
+    u.tendencia === 'OK' ? 'ok' : u.tendencia === 'AVISO' ? 'warn' : 'fail');
+  add('Estocástico 10,3,3', '%K ' + f2(u.k, 0) + ' · %D ' + f2(u.d, 0), u.estocasticoOK ? 'Cruce ↑' : 'Sin cruce', u.estocasticoOK ? 'ok' : 'fail');
+  if (t === 'NVDA') add('Pullback', 'Retroceso desde máx. 10 sesiones (mín. 5 %)', pct(u.retroceso), u.pullbackOK ? 'ok' : 'fail');
+  const lo = Math.min(u.mm21, u.mm52), hi = Math.max(u.mm21, u.mm52), dentro = K >= lo && K <= hi;
+  add('Strike entre MM21 y MM52', f2(lo) + ' – ' + f2(hi), dentro ? 'Dentro' : 'Fuera', dentro ? 'ok' : 'fail');
+  const dist = (S - K) / S, dmin = c.dist[t] / 100;
+  add('Distancia mínima', 'Mín. ' + f2(c.dist[t], 1) + ' %', pct(dist), dist >= dmin ? 'ok' : 'fail');
+  if (t === 'INTC') add('Bajo MM 52 semanas', 'MM ' + f2(u.mm52semanas), K < u.mm52semanas ? 'Sí' : 'No', K < u.mm52semanas ? 'ok' : 'fail');
+  add('IVR', 'Mínimo ' + c.ivrMin, isFinite(ivr) ? f2(ivr, 0) : 'Sin dato', !isFinite(ivr) ? 'warn' : ivr > c.ivrMin ? 'ok' : 'fail');
+  const cmin = u.tipo === 'Índice' ? c.credIdx : c.credGro;
+  add('Crédito mínimo', 'Mín. $' + f2(cmin), '$' + f2(cr), cr >= cmin ? 'ok' : 'fail');
+  if (isFinite(pw)) add('Put wall (indicador)', 'Put wall ' + f2(pw), K <= pw ? 'Debajo' : 'Encima', K <= pw ? 'ok' : 'warn');
+  else add('Put wall (indicador)', 'Sin dato', '—', 'na');
+  if (ACCIONES.includes(t)) {
+    if (!st.f.earn) add('Earnings', 'Introduce la fecha', '—', 'warn');
+    else {
+      const e = new Date(st.f.earn + 'T12:00:00'), antes = e <= venc;
+      add('Earnings', antes ? 'Caen antes del vencimiento' : 'Después del vencimiento', e.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }), antes ? 'fail' : 'ok');
+    }
+  }
+  add('Posiciones abiertas', 'Máximo ' + c.maxPos, c.pos + ' → ' + (c.pos + 1), c.pos < c.maxPos ? 'ok' : 'fail');
+
+  const T = dias / 365;
+  let em = NaN, sig = NaN, prob = NaN;
+  if (iv > 0) {
+    em = S * iv * Math.sqrt(T);
+    sig = Math.log(S / K) / (iv * Math.sqrt(T));
+    prob = ncdf((Math.log(S / K) - 0.5 * iv * iv * T) / (iv * Math.sqrt(T)));
+  }
+  const nf = R.filter(r => r.s === 'fail').length, nw = R.filter(r => r.s === 'warn').length;
+  st.res = { t, K, cr, dias, venc, R, em, sig, prob, S, nf, nw, nok: R.filter(r => r.s === 'ok').length, estado: nf ? 'rojo' : nw ? 'amarillo' : 'verde' };
+  st.vista = 'res'; render(); window.scrollTo(0, 0);
+}
+
+function vRes() {
+  const r = st.res, c = st.cfg;
+  const E = {
+    verde: ['var(--ok)', '#11241A', 'Verde', 'Valida para entrar', 'Todas las reglas se cumplen.', 'Registrar operación'],
+    amarillo: ['var(--wa)', '#251E0C', 'Amarillo', 'Entrar con reservas', r.nw + ' aviso(s); ninguna regla obligatoria falla.', 'Registrar igualmente'],
+    rojo: ['var(--ko)', '#2A1214', 'Rojo', 'No entrar', r.nf + ' regla(s) no se cumplen.', '']
+  }[r.estado];
+  const venc = r.venc.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  const risk = (c.ancho - r.cr) * 100;
+  let h = `<div style="display:flex;align-items:center;gap:12px">
+    <button class="ibtn" aria-label="Volver" onclick="ir('validar')">${ICON.back}</button>
+    ${logo(r.t, 36)}
+    <div class="col"><div class="mono" style="font-size:17px;font-weight:600">${r.t} ${f2(r.K, 1)}/${f2(r.K - c.ancho, 1)} P</div>
+    <div class="lab">${venc} · ${r.dias} días · crédito $${f2(r.cr)}</div></div></div>`;
+  h += `<div style="background:${E[1]};border:1.5px solid ${E[0]};border-radius:20px;padding:20px;display:flex;align-items:center;gap:20px">
+    <div class="lights">
+      <div class="light" style="${r.estado === 'rojo' ? 'background:#E5484D' : ''}"></div>
+      <div class="light" style="${r.estado === 'amarillo' ? 'background:#FFC53D' : ''}"></div>
+      <div class="light" style="${r.estado === 'verde' ? 'background:#5BE09A' : ''}"></div>
+    </div>
+    <div class="col" style="gap:6px;min-width:0">
+      <div style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:${E[0]};font-weight:700">${E[2]}</div>
+      <div style="font-size:22px;font-weight:700;line-height:1.2">${E[3]}</div>
+      <div style="font-size:14px;color:var(--tx2);line-height:1.4">${E[4]}</div>
+    </div></div>`;
+  h += `<div class="grid2" style="gap:10px">
+    <div class="stat"><span class="lab">Beneficio máx.</span><span class="v">$${f2(r.cr * 100, 0)}</span></div>
+    <div class="stat"><span class="lab">Riesgo máx.</span><span class="v">$${f2(risk, 0)}</span></div>
+    <div class="stat"><span class="lab">Break-even</span><span class="v">${f2(r.K - r.cr)}</span></div>
+    <div class="stat"><span class="lab">Retorno / riesgo</span><span class="v">${pct(r.cr * 100 / risk)}</span></div></div>`;
+  if (isFinite(r.em)) {
+    h += `<div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div class="row"><span style="font-size:13px;font-weight:600;color:var(--tx2)">Movimiento esperado</span><span class="chip s-na">Indicativo</span></div>
+      <div class="grid2" style="gap:10px">
+        <div class="col"><span class="lab">±1σ al vencimiento</span><span class="mono">±${f2(r.em)} (${pct(r.em / r.S)})</span></div>
+        <div class="col"><span class="lab">Rango 1σ</span><span class="mono">${f2(r.S - r.em, 1)} – ${f2(r.S + r.em, 1)}</span></div>
+        <div class="col"><span class="lab">Strike a</span><span class="mono">${f2(r.sig)} σ</span></div>
+        <div class="col"><span class="lab">Prob. acabar por encima</span><span class="mono">≈ ${pct(r.prob, 0)}</span></div>
+      </div></div>`;
+  }
+  h += `<div class="row" style="align-items:baseline"><h2 style="color:var(--tx2);text-transform:none;letter-spacing:0;font-size:15px">Reglas</h2><span class="mono" style="font-size:13px;color:var(--mut)">${r.nok} / ${r.R.length} OK</span></div>`;
+  h += `<div class="card" style="padding:4px 14px">` + r.R.map(x => `<div class="rule">
+      <div class="dot s-${x.s}">${ICON[x.s]}</div>
+      <div class="col" style="flex:1;min-width:0"><span style="font-size:14px">${esc(x.name)}</span><span class="note">${esc(x.note)}</span></div>
+      <span class="mono" style="font-size:13px;text-align:right;color:${x.s === 'fail' ? 'var(--ko)' : x.s === 'warn' ? 'var(--wa)' : 'var(--tx2)'}">${esc(x.value)}</span></div>`).join('') + '</div>';
+  h += `<div class="grid2" style="gap:10px">
+    <button class="btn sec" onclick="ir('validar')">Editar datos</button>
+    ${E[5] ? `<button class="btn" style="background:${E[0]};color:#0B0E12" onclick="registrar()">${E[5]}</button>` : `<button class="btn sec" onclick="ir('radar')">Volver al radar</button>`}
+  </div>`;
+  return h;
+}
+
+function vAjustes() {
+  const c = st.cfg;
+  const inp = (path, lab, val) => `<div class="field"><label for="a_${path}">${lab}</label><input id="a_${path}" inputmode="decimal" value="${esc(val)}" onchange="setCfg('${path}',this.value)"></div>`;
+  let h = `<div class="col"><div class="eyebrow">Configuración</div><h1>Ajustes</h1></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Conexión con la hoja</div>
+    ${!c.url || !c.clave ? '<div class="note">Pega la URL de la aplicación web (la que termina en /exec) y tu clave.</div>' : ''}
+    ${st.error ? `<div class="note" style="color:var(--ko)">${esc(st.error)}</div>` : ''}
+    <div class="field"><label for="a_url">URL de la hoja</label><input id="a_url" type="url" autocapitalize="off" autocorrect="off" value="${esc(c.url)}" onchange="setTxt('url',this.value)" style="font-size:13px"></div>
+    <div class="field"><label for="a_clave">Clave</label><input id="a_clave" type="password" autocapitalize="off" autocorrect="off" value="${esc(c.clave)}" onchange="setTxt('clave',this.value)"></div>
+    <button class="btn sec" onclick="setTxt('url',document.getElementById('a_url').value);setTxt('clave',document.getElementById('a_clave').value);guardarYCargar()">Guardar y cargar datos</button></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Posiciones</div>
+    <div class="grid2">${inp('pos', 'Abiertas ahora', c.pos)}${inp('maxPos', 'Máximo', c.maxPos)}</div></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Distancia mínima del strike (%)</div>
+    <div class="grid3" style="gap:12px">${TICKS.map(t => inp('dist.' + t, t, c.dist[t])).join('')}</div></div>`;
+  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Reglas generales</div>
+    <div class="grid2">${inp('credIdx', 'Crédito mín. índices ($)', c.credIdx)}${inp('credGro', 'Crédito mín. growth ($)', c.credGro)}${inp('ivrMin', 'IVR mínimo', c.ivrMin)}${inp('ancho', 'Ancho del spread ($)', c.ancho)}</div></div>`;
+  h += `<button class="btn pri" onclick="guardarCfg()">Guardar ajustes</button>`;
+  return h;
+}
+
+// ---------- acciones ----------
+function setCfg(path, v) {
+  const n = num(v); if (!isFinite(n)) return;
+  if (path.startsWith('dist.')) st.cfg.dist[path.slice(5)] = n; else st.cfg[path] = n;
+}
+function selT(t) {
+  ['venc', 'strike', 'credito', 'iv', 'ivr', 'putwall', 'earn'].forEach(id => { const e = document.getElementById(id); if (e) st.f[id] = e.value; });
+  if (st.f.t !== t) { st.f = { t: t, venc: st.f.venc }; }
+  render();
+}
+function abrir(t) { st.f = { t: t, venc: st.f.venc }; ir('validar'); }
+function ir(v) { st.vista = v; render(); window.scrollTo(0, 0); }
+function registrar() {
+  st.cfg.pos += 1; guardarCfg('Operación registrada · ' + st.cfg.pos + '/' + st.cfg.maxPos);
+  ir('radar');
+}
+
+function render() {
+  let body;
+  if (st.vista === 'ajustes') body = vAjustes();
+  else if (st.cargando && !st.datos) body = '<div class="center">Cargando datos…</div>';
+  else if (!st.datos) body = `<div class="center err">No se pudieron cargar los datos.<br><span class="note">${esc(st.error || 'Configura la conexión en Ajustes.')}</span><br><br><button class="btn sec" onclick="cargar()">Reintentar</button></div>`;
+  else body = st.vista === 'radar' ? vRadar() : st.vista === 'validar' ? vValidar() : vRes();
+  const tab = (v, ic, lab) => `<button class="${st.vista === v || (v === 'validar' && st.vista === 'res') ? 'on' : ''}" onclick="ir('${v}')">${ic}<span>${lab}</span></button>`;
+  document.getElementById('app').innerHTML = `<div class="wrap">${body}</div>
+    <nav class="tabs">${tab('radar', ICON.radar, 'Radar')}${tab('validar', ICON.check, 'Validar')}${tab('ajustes', ICON.gear, 'Ajustes')}</nav>`;
+}
+
+cargarCfg();
+cargar();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
