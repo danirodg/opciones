@@ -1,6 +1,6 @@
 // Guarda la app para que abra rápido y sin conexión.
 // Los datos de la hoja y los logos siempre se piden a internet.
-const CACHE = 'bullput-v1';
+const CACHE = 'bullput-v2';
 const ARCHIVOS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

@@ -151,11 +151,28 @@ function toast(m) {
 }
 
 // ---------- reglas ----------
+// Fechas de la hoja ('aaaa-mm-dd') a Date a mediodía, sin líos de zona horaria
+function dia(v) {
+  if (!v) return null;
+  const d = new Date(String(v).slice(0, 10) + 'T12:00:00');
+  return isNaN(d) ? null : d;
+}
+const fCorta = d => d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+const diasHasta = d => Math.round((d - new Date()) / 864e5);
+function fedFechas() {
+  return ((st.datos && st.datos.fed) || []).map(x => ({ d: dia(x.fecha), sep: x.sep })).filter(x => x.d).sort((a, b) => a.d - b.d);
+}
+function proximaFed() {
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  return fedFechas().find(x => x.d >= hoy) || null;
+}
+
+// Zona de strike: por debajo de la media más alta (normalmente MM21) y con la
+// distancia mínima. Por debajo de la MM52 también vale. INTC: además bajo la MM de 52 semanas.
 function zona(u) {
-  const lo = Math.min(u.mm21, u.mm52);
   let hi = Math.min(Math.max(u.mm21, u.mm52), u.precio * (1 - st.cfg.dist[u.ticker] / 100));
   if (u.ticker === 'INTC') hi = Math.min(hi, u.mm52semanas);
-  return hi > lo ? { lo, hi } : null;
+  return isFinite(hi) && hi > 0 ? { hi } : null;
 }
 function clasificar(u) {
   const ch = [], notas = []; let fail = false, warn = false;
@@ -169,12 +186,14 @@ function clasificar(u) {
     else { ch.push(['Sin pullback', 'warn']); warn = true; notas.push('Retroceso ' + pct(u.retroceso) + ' (mín. 5 %)'); }
   }
   const z = zona(u);
-  if (!z) {
-    ch.push(['Sin zona strike', 'fail']); fail = true;
-    notas.push('Con distancia mín. ' + f2(st.cfg.dist[u.ticker], 0) + ' % no cabe strike entre MM21 y MM52' + (u.ticker === 'INTC' ? ' y bajo la MM de 52 semanas' : ''));
-  } else if ((z.hi - z.lo) / u.precio < 0.005) {
-    ch.push(['Zona estrecha', 'warn']); warn = true;
-  } else ch.push(['Zona strike', 'ok']);
+  if (!z) { ch.push(['Sin zona strike', 'fail']); fail = true; }
+  else ch.push(['Zona strike', 'ok']);
+  // Earnings (solo acciones): informativo en el radar; la regla se aplica al validar
+  if (ACCIONES.includes(u.ticker)) {
+    const e = dia(u.earnings);
+    if (!e) { ch.push(['Sin fecha earnings', 'warn']); warn = true; notas.push('Añade la fecha en la pestaña Earnings de la hoja'); }
+    else if (diasHasta(e) >= 0 && diasHasta(e) <= 60) ch.push(['Earnings ' + e.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }), 'na']);
+  }
   return { estado: fail ? 'rojo' : warn ? 'amarillo' : 'verde', ch, notas, z };
 }
 
@@ -197,6 +216,8 @@ function vRadar() {
   h += '<div class="grid3">' + grupos.map(g => `<div class="sum" style="background:${g[3]};border:1px solid ${g[4]}">
       <div class="mono" style="font-size:22px;font-weight:600;color:${g[2]}">${items.filter(i => i.c.estado === g[0]).length}</div>
       <div style="font-size:12px;color:var(--tx2)">${g[1]}</div></div>`).join('') + '</div>';
+  const pf = proximaFed();
+  if (pf) h += `<div class="note">Próxima decisión de la FED: <span class="mono" style="color:var(--tx2)">${fCorta(pf.d)}</span> · en ${diasHasta(pf.d)} días${pf.sep ? ' · con proyecciones' : ''}</div>`;
   grupos.forEach(g => {
     const its = items.filter(i => i.c.estado === g[0]);
     if (!its.length) return;
@@ -205,7 +226,7 @@ function vRadar() {
       h += `<button class="card tk" onclick="abrir('${u.ticker}')">
         <div class="row" style="width:100%">
           <div style="display:flex;align-items:center;gap:10px">${logo(u.ticker, 32)}<span class="mono" style="font-size:18px;font-weight:600">${u.ticker}</span><span class="mono" style="font-size:14px;color:var(--mut)">${f2(u.precio)}</span></div>
-          <div style="display:flex;align-items:center;gap:6px;color:#5C6676"><span style="font-size:12px;color:var(--mut)">${c.z ? 'Zona ' + f2(c.z.lo, 1) + ' – ' + f2(c.z.hi, 1) : 'Sin zona'}</span>${ICON.chev}</div>
+          <div style="display:flex;align-items:center;gap:6px;color:#5C6676"><span style="font-size:12px;color:var(--mut)">${c.z ? 'Strike ≤ ' + f2(c.z.hi, 1) : 'Sin zona'}</span>${ICON.chev}</div>
         </div>
         <div class="chips">${c.ch.map(x => `<span class="chip s-${x[1]}">${esc(x[0])}</span>`).join('')}</div>
         ${c.notas.length ? `<div class="note">${c.notas.map(esc).join(' · ')}</div>` : ''}
@@ -244,7 +265,9 @@ function vValidar() {
       <div class="col"><span class="lab">MM21</span><span class="mono">${f2(u.mm21)}</span></div>
       <div class="col"><span class="lab">MM52</span><span class="mono">${f2(u.mm52)}</span></div>
       <div class="col"><span class="lab">%K / %D</span><span class="mono">${f2(u.k, 0)} / ${f2(u.d, 0)}</span></div>
-      <div class="col"><span class="lab">Zona strike</span><span class="mono">${c.z ? f2(c.z.lo, 1) + '–' + f2(c.z.hi, 1) : 'Ninguna'}</span></div>
+      <div class="col"><span class="lab">Zona strike</span><span class="mono">${c.z ? '≤ ' + f2(c.z.hi, 1) : 'Ninguna'}</span></div>
+      ${ACCIONES.includes(t) ? `<div class="col"><span class="lab">Earnings (hoja)</span><span class="mono">${dia(u.earnings) ? fCorta(dia(u.earnings)) : 'Sin fecha'}</span></div>` : ''}
+      ${proximaFed() ? `<div class="col"><span class="lab">Próxima FED</span><span class="mono">${fCorta(proximaFed().d)}</span></div>` : ''}
       ${t === 'INTC' ? `<div class="col"><span class="lab">MM 52 semanas</span><span class="mono">${f2(u.mm52semanas)}</span></div>` : ''}
       ${t === 'NVDA' ? `<div class="col"><span class="lab">Retroceso</span><span class="mono">${pct(u.retroceso)}</span></div>` : ''}
     </div>
@@ -264,7 +287,6 @@ function vValidar() {
     <div class="grid2">
       ${campo('ivr', 'IVR', st.f.ivr)}
       ${campo('putwall', 'Put wall (OI venc.)', st.f.putwall)}
-      ${ACCIONES.includes(t) ? campo('earn', 'Earnings', st.f.earn, 'type="date"') : ''}
     </div></div>`;
   h += `<button class="btn pri" onclick="validar()">Validar operación</button>`;
   return h;
@@ -285,8 +307,10 @@ function validar() {
     u.tendencia === 'OK' ? 'ok' : u.tendencia === 'AVISO' ? 'warn' : 'fail');
   add('Estocástico 10,3,3', '%K ' + f2(u.k, 0) + ' · %D ' + f2(u.d, 0), u.estocasticoOK ? 'Cruce ↑' : 'Sin cruce', u.estocasticoOK ? 'ok' : 'fail');
   if (t === 'NVDA') add('Pullback', 'Retroceso desde máx. 10 sesiones (mín. 5 %)', pct(u.retroceso), u.pullbackOK ? 'ok' : 'fail');
-  const lo = Math.min(u.mm21, u.mm52), hi = Math.max(u.mm21, u.mm52), dentro = K >= lo && K <= hi;
-  add('Strike entre MM21 y MM52', f2(lo) + ' – ' + f2(hi), dentro ? 'Dentro' : 'Fuera', dentro ? 'ok' : 'fail');
+  // Strike por debajo de la media más alta (MM21 en tendencia alcista); bajo la MM52 también vale
+  const hiMM = Math.max(u.mm21, u.mm52), bajoMM = K <= hiMM;
+  add('Strike bajo MM21', 'MM21 ' + f2(u.mm21) + ' · MM52 ' + f2(u.mm52),
+    !bajoMM ? 'Encima' : K < Math.min(u.mm21, u.mm52) ? 'Bajo MM52' : 'Entre medias', bajoMM ? 'ok' : 'fail');
   const dist = (S - K) / S, dmin = c.dist[t] / 100;
   add('Distancia mínima', 'Mín. ' + f2(c.dist[t], 1) + ' %', pct(dist), dist >= dmin ? 'ok' : 'fail');
   if (t === 'INTC') add('Bajo MM 52 semanas', 'MM ' + f2(u.mm52semanas), K < u.mm52semanas ? 'Sí' : 'No', K < u.mm52semanas ? 'ok' : 'fail');
@@ -296,12 +320,19 @@ function validar() {
   if (isFinite(pw)) add('Put wall (indicador)', 'Put wall ' + f2(pw), K <= pw ? 'Debajo' : 'Encima', K <= pw ? 'ok' : 'warn');
   else add('Put wall (indicador)', 'Sin dato', '—', 'na');
   if (ACCIONES.includes(t)) {
-    if (!st.f.earn) add('Earnings', 'Introduce la fecha', '—', 'warn');
+    const e = dia(u.earnings), hoy = new Date();
+    if (!e) add('Earnings', 'Sin fecha en la hoja (pestaña Earnings)', '—', 'warn');
     else {
-      const e = new Date(st.f.earn + 'T12:00:00'), antes = e <= venc;
-      add('Earnings', antes ? 'Caen antes del vencimiento' : 'Después del vencimiento', e.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }), antes ? 'fail' : 'ok');
+      const antes = e >= new Date(hoy.toDateString()) && e <= venc;
+      add('Earnings', antes ? 'Caen antes del vencimiento' : 'Fuera del plazo de la operación', e.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }), antes ? 'fail' : 'ok');
     }
   }
+  // FED: informativo, no cambia el semáforo
+  const hoy0 = new Date(); hoy0.setHours(0, 0, 0, 0);
+  const fedEn = fedFechas().filter(x => x.d >= hoy0 && x.d <= venc);
+  if (!fedFechas().length) add('FED (FOMC)', 'Sin fechas en la hoja (pestaña FED)', '—', 'na');
+  else if (fedEn.length) add('FED (FOMC)', fedEn.length + ' decisión(es) antes del vencimiento' + (fedEn.some(x => x.sep) ? ' · con proyecciones' : ''), fedEn.map(x => x.d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })).join(', '), 'na');
+  else add('FED (FOMC)', 'Ninguna decisión antes del vencimiento', '—', 'ok');
   add('Posiciones abiertas', 'Máximo ' + c.maxPos, c.pos + ' → ' + (c.pos + 1), c.pos < c.maxPos ? 'ok' : 'fail');
 
   const T = dias / 365;
