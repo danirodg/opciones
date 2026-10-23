@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#0E1116">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Bull Put">
-<title>Bull Put</title>
+<meta name="apple-mobile-web-app-title" content="Options Radar">
+<title>Options Radar</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -17,7 +17,7 @@
   --bg:#0E1116;--card:#161A21;--line:#222833;--line2:#2A313D;
   --tx:#E8ECF2;--tx2:#C3CAD5;--mut:#8B95A5;--acc:#7FB2FF;
   --ok:#5BE09A;--okbg:#173A28;--wa:#FFC53D;--wabg:#3D2F0E;
-  --ko:#FF8A8E;--kobg:#3F1719;--nabg:#1E232C
+  --ko:#FF8A8E;--kobg:#3F1719;--nabg:#1E232C;--gold:#E3B341
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-text-size-adjust:100%}
@@ -29,31 +29,38 @@ h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:u
 .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .col{display:flex;flex-direction:column;gap:2px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.ctitle{font-size:13px;font-weight:600;color:var(--tx2)}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{height:26px;border-radius:13px;padding:0 10px;font-size:12px;font-weight:500;display:inline-flex;align-items:center}
+.chip{height:26px;border-radius:13px;padding:0 10px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;white-space:nowrap}
 .s-ok{background:var(--okbg);color:var(--ok)}
 .s-warn{background:var(--wabg);color:var(--wa)}
 .s-fail{background:var(--kobg);color:var(--ko)}
 .s-na{background:var(--nabg);color:var(--mut)}
+.c-ok{color:var(--ok)}.c-warn{color:var(--wa)}.c-fail{color:var(--ko)}.c-na{color:var(--tx2)}
 .tk{width:100%;text-align:left;cursor:pointer;color:inherit;font:inherit;display:flex;flex-direction:column;gap:10px}
 .note{font-size:12px;color:var(--mut);line-height:1.4}
 .sum{border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.field{display:flex;flex-direction:column;gap:6px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
 label{font-size:12px;color:var(--mut)}
-input{height:44px;width:100%;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--tx);padding:0 12px;font-size:16px;font-family:'IBM Plex Mono',monospace;-webkit-appearance:none;appearance:none}
+input,select{height:44px;width:100%;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--tx);padding:0 12px;font-size:16px;font-family:'IBM Plex Mono',monospace;-webkit-appearance:none;appearance:none}
 input[type=date]{display:block;min-width:0;line-height:44px}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .auto{height:44px;border-radius:10px;border:1px dashed var(--line2);color:var(--mut);padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:15px;display:flex;align-items:center}
-.pill{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--tx2);font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;cursor:pointer}
+.pill{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--tx2);font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .pill.on{border:1.5px solid var(--acc);background:#1B2A44;color:#fff;font-weight:600}
 .btn{height:52px;border-radius:14px;border:none;font:inherit;font-size:16px;font-weight:700;width:100%;cursor:pointer}
 .btn.pri{background:var(--acc);color:#0B1220}
 .btn.sec{background:var(--card);border:1px solid var(--line2);color:var(--tx);font-weight:600}
+.btn.sm{height:44px;font-size:14px;border-radius:12px}
+.btn:disabled{opacity:.5}
 .ibtn{width:44px;height:44px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(11,14,18,.96);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
-.tabs button{flex:1;max-width:160px;height:58px;background:none;border:none;color:var(--mut);font:inherit;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.tabs button{flex:1;max-width:130px;height:58px;background:none;border:none;color:var(--mut);font:inherit;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative}
 .tabs button.on{color:var(--acc)}
+.tabs .badge{position:absolute;top:7px;left:calc(50% + 6px);min-width:16px;height:16px;border-radius:8px;background:var(--ko);color:#1A0507;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
 .lights{background:#07090C;border-radius:22px;padding:10px;display:flex;flex-direction:column;gap:8px}
 .light{width:32px;height:32px;border-radius:16px;background:#22272F}
 .rule{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid var(--line);padding:6px 0}
@@ -62,38 +69,53 @@ input[type=date]{display:block;min-width:0;line-height:44px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
 .stat .v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600}
 .lab{font-size:12px;color:var(--mut)}
-.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#1B2A44;color:#fff;border:1px solid var(--acc);padding:10px 16px;border-radius:12px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#1B2A44;color:#fff;border:1px solid var(--acc);padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;max-width:90vw;text-align:center}
 .center{text-align:center;color:var(--mut);padding:40px 0}
 .logo{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#F2F4F7;overflow:hidden;flex-shrink:0;color:#0E1116;font-family:'IBM Plex Mono',monospace;font-weight:600}
 .logo img{width:70%;height:70%;object-fit:contain}
-.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.mkt{border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.salida{border-radius:12px;padding:10px 12px;background:#2E2408;border:1.5px solid var(--gold);color:#FBE6A2;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{height:38px;border:none;border-radius:9px;background:none;color:var(--mut);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.seg button.on{background:#1B2A44;color:#fff}
+.bar{height:8px;border-radius:4px;background:var(--nabg);overflow:hidden;position:relative}
+.bar span{display:block;height:100%;border-radius:4px}
+.bar i{position:absolute;top:0;bottom:0;width:2px;background:var(--mut)}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:none}
+.kv span:last-child{font-family:'IBM Plex Mono',monospace;text-align:right}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
 const TICKS = ['IWM', 'SPY', 'QQQ', 'AAPL', 'NVDA', 'INTC'];
-const ACCIONES = ['AAPL', 'NVDA', 'INTC']; // piden fecha de earnings
+const ACCIONES = ['AAPL', 'NVDA', 'INTC']; // tienen fecha de earnings
 const CFG0 = {
-  dist: { IWM: 3, SPY: 3, QQQ: 3, AAPL: 3, NVDA: 5, INTC: 5 },
-  credIdx: 1.00, credGro: 1.15, ivrMin: 25, maxPos: 4, pos: 0, ancho: 5,
+  ancho: 5, cuenta: 5000, riesgoVerde: 1250, riesgoMax: 1500, maxMismoVenc: 2,
+  dteMin: 30, dteMax: 45, deltaMax: 0.25,
+  benAviso: 50, benObjetivo: 70, dteAviso: 21, dteCierre: 15, stopMult: 2,
   url: '', clave: ''
 };
-// Logos: icono del sitio web de cada emisor/empresa, cargado al vuelo
+const MOTIVOS = { objetivo: 'Objetivo', stop: 'Stop', tiempo: 'Tiempo', manual: 'Manual' };
 const DOMINIOS = { IWM: 'ishares.com', SPY: 'ssga.com', QQQ: 'invesco.com', AAPL: 'apple.com', NVDA: 'nvidia.com', INTC: 'intel.com' };
 function logo(t, px) {
-  return `<span class="logo" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.45)}px"><img alt="" src="https://www.google.com/s2/favicons?domain=${DOMINIOS[t]}&sz=128" onerror="this.parentNode.textContent='${t[0]}'"></span>`;
+  const d = DOMINIOS[t];
+  if (!d) return `<span class="logo" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.45)}px">${esc((t || '?')[0])}</span>`;
+  return `<span class="logo" style="width:${px}px;height:${px}px;font-size:${Math.round(px * 0.45)}px"><img alt="" src="https://www.google.com/s2/favicons?domain=${d}&sz=128" onerror="this.parentNode.textContent='${t[0]}'"></span>`;
 }
 const st = {
   datos: null, cfg: JSON.parse(JSON.stringify(CFG0)),
-  vista: 'radar', f: { t: 'QQQ' }, res: null, cargando: true, error: ''
+  vista: 'radar', f: { t: 'QQQ' }, res: null, reg: null,
+  hoja: 'Posiciones', accion: null, enviando: false, cargando: true, error: ''
 };
 
 // ---------- utilidades ----------
 const num = v => (v === undefined || v === null || v === '') ? NaN : parseFloat(String(v).replace(',', '.'));
 const f2 = (x, d = 2) => isFinite(x) ? x.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
 const pct = (x, d = 1) => isFinite(x) ? f2(x * 100, d) + ' %' : '—';
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const usd = (x, d = 0) => isFinite(x) ? (x < 0 ? '−' : '') + f2(Math.abs(x), d) + ' $' : '—';
+const esc = s => String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const U = t => st.datos && st.datos.subyacentes.find(u => u.ticker === t);
 function ncdf(x) {
   const t = 1 / (1 + 0.2316419 * Math.abs(x));
@@ -101,6 +123,19 @@ function ncdf(x) {
   const p = d * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
   return x > 0 ? 1 - p : p;
 }
+// Fechas 'aaaa-mm-dd' a mediodía (sin saltos de zona horaria)
+function dia(v) {
+  if (!v) return null;
+  const d = new Date(String(v).slice(0, 10) + 'T12:00:00');
+  return isNaN(d) ? null : d;
+}
+function hoyISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+const hoyMed = () => dia(hoyISO());
+const diasA = v => { const d = dia(v); return d ? Math.round((d - hoyMed()) / 864e5) : NaN; };
+const fCorta = d => d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+const fDM = d => d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+function sumarDias(v, n) { const d = dia(v); d.setDate(d.getDate() + n); return d; }
+
 const ICON = {
   ok: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
   warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v8M12 18.5v.5"/></svg>',
@@ -111,22 +146,28 @@ const ICON = {
   reload: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>',
   radar: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></svg>',
   check: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12l2.5 2.5 5-5"/></svg>',
-  gear: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
+  pos: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  gear: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  bell: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>'
 };
 
-// ---------- carga ----------
+// ---------- carga y envío ----------
 function leerLocal(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
 function escribirLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
 function cargarCfg() {
   const c = leerLocal('bp_cfg');
-  if (c) st.cfg = Object.assign({}, CFG0, c, { dist: Object.assign({}, CFG0.dist, c.dist || {}) });
+  if (c) { st.cfg = Object.assign({}, CFG0); Object.keys(CFG0).forEach(k => { if (c[k] !== undefined) st.cfg[k] = c[k]; }); }
+}
+function urlBase() {
+  const base = st.cfg.url.trim();
+  return base;
 }
 function cargar() {
-  if (!st.cfg.url || !st.cfg.clave) { st.cargando = false; st.vista = 'ajustes'; render(); return; }
+  if (!st.cfg.url || !st.cfg.clave) { st.cargando = false; st.vista = 'ajustes'; render(); return Promise.resolve(); }
   st.cargando = true; st.error = ''; render();
-  const base = st.cfg.url.trim();
-  const u = base + (base.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(st.cfg.clave.trim());
-  fetch(u)
+  const base = urlBase();
+  const u = base + (base.includes('?') ? '&' : '?') + 'k=' + encodeURIComponent(st.cfg.clave.trim()) + '&t=' + Date.now();
+  return fetch(u)
     .then(r => r.json())
     .then(d => {
       if (d.error) throw new Error(d.error === 'clave incorrecta' ? 'Clave incorrecta' : d.error);
@@ -140,64 +181,118 @@ function cargar() {
     })
     .finally(() => { st.cargando = false; render(); });
 }
-function guardarCfg(msg) {
-  toast(escribirLocal('bp_cfg', st.cfg) ? (msg || 'Guardado') : 'No se pudo guardar');
+// Escritura en la hoja (doPost del Apps Script). text/plain evita el bloqueo CORS.
+function enviar(cuerpo, okMsg, despues) {
+  if (st.enviando) return;
+  st.enviando = true; render();
+  fetch(urlBase(), {
+    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ k: st.cfg.clave.trim() }, cuerpo))
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (d.error) throw new Error(d.error);
+      toast(okMsg); if (despues) despues();
+      return cargar();
+    })
+    .catch(e => toast('No se pudo guardar: ' + (e.message || e)))
+    .finally(() => { st.enviando = false; render(); });
 }
+function guardarCfg(msg) { toast(escribirLocal('bp_cfg', st.cfg) ? (msg || 'Guardado') : 'No se pudo guardar'); }
 function guardarYCargar() { guardarCfg('Guardado'); st.vista = 'radar'; cargar(); }
 function setTxt(path, v) { st.cfg[path] = v.trim(); }
 function toast(m) {
   const d = document.createElement('div'); d.className = 'toast'; d.textContent = m;
-  document.body.appendChild(d); setTimeout(() => d.remove(), 2200);
+  document.body.appendChild(d); setTimeout(() => d.remove(), 2600);
 }
 
-// ---------- reglas ----------
-// Fechas de la hoja ('aaaa-mm-dd') a Date a mediodía, sin líos de zona horaria
-function dia(v) {
-  if (!v) return null;
-  const d = new Date(String(v).slice(0, 10) + 'T12:00:00');
-  return isNaN(d) ? null : d;
-}
-const fCorta = d => d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-const diasHasta = d => Math.round((d - new Date()) / 864e5);
+// ---------- datos derivados ----------
 function fedFechas() {
   return ((st.datos && st.datos.fed) || []).map(x => ({ d: dia(x.fecha), sep: x.sep })).filter(x => x.d).sort((a, b) => a.d - b.d);
 }
-function proximaFed() {
-  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-  return fedFechas().find(x => x.d >= hoy) || null;
+function proximaFed() { const h = hoyMed(); return fedFechas().find(x => x.d >= h) || null; }
+function registro(hoja) { return (st.datos && st.datos[hoja === 'Demo' ? 'demo' : 'posiciones']) || []; }
+const abiertas = hoja => registro(hoja).filter(p => p.estado !== 'Cerrada');
+const cerradas = hoja => registro(hoja).filter(p => p.estado === 'Cerrada');
+const riesgoAbierto = hoja => abiertas(hoja).reduce((s, p) => s + (num(p.riesgo) || 0), 0);
+function nivelRiesgo(x) { const c = st.cfg; return x <= c.riesgoVerde ? 'ok' : x <= c.riesgoMax ? 'warn' : 'fail'; }
+function rsiInfo(r) {
+  if (!isFinite(r)) return ['—', 'na'];
+  if (r > 70) return ['Sobrecompra', 'warn'];
+  if (r >= 40) return ['Sweet spot', 'ok'];
+  if (r >= 30) return ['Debilidad', 'warn'];
+  return ['Sobreventa', 'fail'];
 }
 
-// Zona de strike: por debajo de la media más alta (normalmente MM21) y con la
-// distancia mínima. Por debajo de la MM52 también vale. INTC: además bajo la MM de 52 semanas.
-function zona(u) {
-  let hi = Math.min(Math.max(u.mm21, u.mm52), u.precio * (1 - st.cfg.dist[u.ticker] / 100));
-  if (u.ticker === 'INTC') hi = Math.min(hi, u.mm52semanas);
-  return isFinite(hi) && hi > 0 ? { hi } : null;
+// ---------- filtro de mercado ----------
+function vMercado() {
+  const m = st.datos && st.datos.mercado;
+  const r = m ? num(m.ratio) : NaN;
+  if (!isFinite(r)) return `<div class="card note">Filtro de mercado sin datos: revisa la pestaña Mercado de la hoja.</div>`;
+  const back = r > 1;
+  const col = back ? 'var(--ko)' : 'var(--ok)', bg = back ? '#2A1214' : '#11241A', bd = back ? '#4F2226' : '#1F4A33';
+  const fecha = dia(m.fecha), ant = num(m.ratioAnterior);
+  let h = '';
+  if (m.salida) {
+    h += `<div class="salida">${ICON.bell}<span>Salida de backwardation · ${fCorta(dia(m.salida))}</span></div>`;
+  }
+  h += `<div class="mkt" style="background:${bg};border:1px solid ${bd}">
+    <div class="row">
+      <div class="col"><span class="lab">Filtro de mercado · VIX / VIX3M</span>
+        <span style="font-size:18px;font-weight:700;color:${col}">${back ? 'Backwardation' : 'Contango'}</span></div>
+      <div class="col" style="align-items:flex-end"><span class="mono" style="font-size:26px;font-weight:600;color:${col}">${f2(r, 3)}</span>
+        <span class="lab">${isFinite(ant) ? 'anterior ' + f2(ant, 3) : ''}</span></div>
+    </div>
+    <div class="note">VIX ${f2(num(m.vix))} · VIX3M ${f2(num(m.vix3m))}${fecha ? ' · cierre del ' + fDM(fecha) : ''}${back ? ' · mercado en estrés: entra con cautela' : ''}</div>
+  </div>`;
+  return h;
 }
+
+// ---------- gestión de una posición abierta ----------
+function gestion(p) {
+  const c = st.cfg, cr = num(p.credito), pa = num(p.precioActual), dte = diasA(p.vencimiento);
+  const u = U(p.ticker), K = num(p.strikeVendido);
+  const al = [];
+  let ben = NaN;
+  if (isFinite(pa) && cr > 0) {
+    ben = (cr - pa) / cr;
+    const stopPrecio = cr * (1 + c.stopMult);
+    if (pa >= stopPrecio) al.push(['Stop: cerrar', 'fail']);
+    else if (ben * 100 >= c.benObjetivo) al.push(['Objetivo ' + c.benObjetivo + ' %: cerrar', 'ok']);
+    else if (ben * 100 >= c.benAviso) al.push(['Beneficio ' + f2(ben * 100, 0) + ' %', 'warn']);
+  } else al.push(['Sin precio actual', 'na']);
+  if (isFinite(dte)) {
+    if (dte <= c.dteCierre) al.push(['≤ ' + c.dteCierre + ' DTE: cerrar', 'fail']);
+    else if (dte <= c.dteAviso) al.push(['≤ ' + c.dteAviso + ' DTE', 'warn']);
+  }
+  if (u && isFinite(K) && u.precio <= K) al.push(['Precio bajo el strike', 'fail']);
+  const urg = al.some(a => a[1] === 'fail' || (a[1] === 'ok' && a[0].includes('cerrar')));
+  return { al, ben, dte, urg };
+}
+const urgentes = () => abiertas('Posiciones').filter(p => gestion(p).urg).length;
+
+// ---------- radar ----------
 function clasificar(u) {
-  const ch = [], notas = []; let fail = false, warn = false;
-  if (u.tendencia === 'FALLO') { ch.push(['Bajo MM52', 'fail']); fail = true; notas.push('Precio ' + f2(u.precio) + ' bajo MM52 ' + f2(u.mm52)); }
-  else if (u.tendencia === 'AVISO') { ch.push(['Bajo MM21', 'warn']); warn = true; }
-  else ch.push(['Tendencia', 'ok']);
-  if (u.estocasticoOK) ch.push(['Estocástico ↑', 'ok']);
-  else { ch.push(['Estocástico', 'warn']); warn = true; notas.push('Esperando cruce al alza del estocástico'); }
+  const c = st.cfg, ch = [], info = [], notas = []; let fail = false, warn = false;
+  if (u.tendencia === 'FALLO') { ch.push(['Bajo MM200', 'fail']); fail = true; notas.push('Cierre ' + f2(u.cierre) + ' bajo MM200 ' + f2(u.mm200)); }
+  else if (u.tendencia === 'AVISO') { ch.push(['Entre MM50 y MM200', 'warn']); warn = true; }
+  else ch.push(['Sobre MM50', 'ok']);
   if (u.ticker === 'NVDA') {
     if (u.pullbackOK) ch.push(['Pullback ' + pct(u.retroceso), 'ok']);
     else { ch.push(['Sin pullback', 'warn']); warn = true; notas.push('Retroceso ' + pct(u.retroceso) + ' (mín. 5 %)'); }
   }
-  const z = zona(u);
-  if (!z) { ch.push(['Sin zona strike', 'fail']); fail = true; }
-  else ch.push(['Zona strike', 'ok']);
-  // Earnings (solo acciones): informativo en el radar; la regla se aplica al validar
   if (ACCIONES.includes(u.ticker)) {
-    const e = dia(u.earnings);
-    if (!e) { ch.push(['Sin fecha earnings', 'warn']); warn = true; notas.push('Añade la fecha en la pestaña Earnings de la hoja'); }
-    else if (diasHasta(e) >= 0 && diasHasta(e) <= 60) ch.push(['Earnings ' + e.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }), 'na']);
+    const n = diasA(u.earnings);
+    if (!isFinite(n)) { ch.push(['Sin fecha earnings', 'warn']); warn = true; notas.push('Añade la fecha en la pestaña Earnings'); }
+    else if (n >= 0 && n <= c.dteMax) { ch.push(['Earnings en ' + n + ' d', 'warn']); warn = true; notas.push('Earnings el ' + fDM(dia(u.earnings)) + ': caen dentro de la ventana de ' + c.dteMin + '-' + c.dteMax + ' DTE'); }
   }
-  return { estado: fail ? 'rojo' : warn ? 'amarillo' : 'verde', ch, notas, z };
+  const ri = rsiInfo(u.rsi);
+  info.push(['RSI ' + f2(u.rsi, 0) + ' · ' + ri[0], ri[1]]);
+  info.push([u.estocasticoOK ? 'Estocástico ↑' : 'Sin cruce estoc.', u.estocasticoOK ? 'ok' : 'na']);
+  info.push(['HV20 ' + pct(u.hv20, 0), 'na']);
+  return { estado: fail ? 'rojo' : warn ? 'amarillo' : 'verde', ch, info, notas };
 }
 
-// ---------- vistas ----------
 function vRadar() {
   if (!st.datos) return '';
   const items = TICKS.map(U).filter(Boolean).map(u => ({ u, c: clasificar(u) }));
@@ -206,29 +301,34 @@ function vRadar() {
     ['amarillo', 'Vigilar', 'var(--wa)', '#251E0C', '#4A3B12'],
     ['rojo', 'Descartados', 'var(--ko)', '#2A1214', '#4F2226']
   ];
-  const cierre = new Date(st.datos.subyacentes[0].ultimoCierre);
+  const cierre = dia(st.datos.subyacentes[0].ultimoCierre);
+  const ra = riesgoAbierto('Posiciones'), nr = nivelRiesgo(ra);
   let h = `<div class="row" style="align-items:flex-end">
-    <div class="col"><div class="eyebrow">Cierre del ${cierre.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</div><h1>Radar</h1></div>
+    <div class="col"><div class="eyebrow">${cierre ? 'Cierre del ' + fDM(cierre) : 'Options Radar'}</div><h1>Radar</h1></div>
     <div style="display:flex;gap:10px;align-items:center">
-      <div class="col" style="align-items:flex-end"><div class="lab">Posiciones</div><div class="mono" style="font-size:20px;font-weight:600">${st.cfg.pos}<span style="color:#5C6676">/${st.cfg.maxPos}</span></div></div>
+      <div class="col" style="align-items:flex-end"><div class="lab">Riesgo abierto</div><div class="mono c-${nr}" style="font-size:18px;font-weight:600">${f2(ra, 0)}<span style="color:#5C6676;font-size:14px"> / ${f2(st.cfg.riesgoMax, 0)} $</span></div></div>
       <button class="ibtn" aria-label="Actualizar" onclick="cargar()">${ICON.reload}</button>
     </div></div>`;
+  h += vMercado();
+  const nu = urgentes();
+  if (nu) h += `<button class="card tk" style="flex-direction:row;align-items:center;border-color:#4F2226" onclick="ir('pos')"><span class="chip s-fail">${nu}</span><span style="flex:1;font-size:14px">${nu === 1 ? 'Una posición pide' : nu + ' posiciones piden'} acción</span><span style="color:var(--mut)">${ICON.chev}</span></button>`;
   h += '<div class="grid3">' + grupos.map(g => `<div class="sum" style="background:${g[3]};border:1px solid ${g[4]}">
       <div class="mono" style="font-size:22px;font-weight:600;color:${g[2]}">${items.filter(i => i.c.estado === g[0]).length}</div>
       <div style="font-size:12px;color:var(--tx2)">${g[1]}</div></div>`).join('') + '</div>';
   const pf = proximaFed();
-  if (pf) h += `<div class="note">Próxima decisión de la FED: <span class="mono" style="color:var(--tx2)">${fCorta(pf.d)}</span> · en ${diasHasta(pf.d)} días${pf.sep ? ' · con proyecciones' : ''}</div>`;
+  if (pf) h += `<div class="note">Próxima decisión de la FED: <span class="mono" style="color:var(--tx2)">${fCorta(pf.d)}</span> · en ${diasA(pf.d.toISOString())} días${pf.sep ? ' · con proyecciones' : ''}</div>`;
   grupos.forEach(g => {
     const its = items.filter(i => i.c.estado === g[0]);
     if (!its.length) return;
-    h += `<div style="display:flex;flex-direction:column;gap:10px"><h2 style="color:${g[2]}">${g[1]}</h2>`;
+    h += `<div class="stack" style="gap:10px"><h2 style="color:${g[2]}">${g[1]}</h2>`;
     its.forEach(({ u, c }) => {
       h += `<button class="card tk" onclick="abrir('${u.ticker}')">
         <div class="row" style="width:100%">
           <div style="display:flex;align-items:center;gap:10px">${logo(u.ticker, 32)}<span class="mono" style="font-size:18px;font-weight:600">${u.ticker}</span><span class="mono" style="font-size:14px;color:var(--mut)">${f2(u.precio)}</span></div>
-          <div style="display:flex;align-items:center;gap:6px;color:#5C6676"><span style="font-size:12px;color:var(--mut)">${c.z ? 'Strike ≤ ' + f2(c.z.hi, 1) : 'Sin zona'}</span>${ICON.chev}</div>
+          <div style="color:#5C6676">${ICON.chev}</div>
         </div>
         <div class="chips">${c.ch.map(x => `<span class="chip s-${x[1]}">${esc(x[0])}</span>`).join('')}</div>
+        <div class="chips">${c.info.map(x => `<span class="chip" style="background:none;border:1px solid var(--line2)"><span class="c-${x[1]}">${esc(x[0])}</span></span>`).join('')}</div>
         ${c.notas.length ? `<div class="note">${c.notas.map(esc).join(' · ')}</div>` : ''}
       </button>`;
     });
@@ -237,105 +337,106 @@ function vRadar() {
   return h;
 }
 
+// ---------- validar ----------
+const IDS = ['venc', 'strike', 'credito', 'delta', 'iv', 'putwall'];
+function leerForm() { IDS.forEach(id => { const e = document.getElementById(id); if (e) st.f[id] = e.value; }); }
 function campo(id, lab, val, extra) {
   return `<div class="field"><label for="${id}">${lab}</label>
     <input id="${id}" ${extra || 'inputmode="decimal"'} value="${esc(val || '')}" oninput="st.f['${id}']=this.value;updAuto()"></div>`;
 }
 function updAuto() {
   const u = U(st.f.t), K = num(st.f.strike);
-  const a = document.getElementById('auto_comp'), b = document.getElementById('auto_dist');
+  const a = document.getElementById('auto_comp'), b = document.getElementById('auto_dist'), d = document.getElementById('auto_dte');
   if (a) a.textContent = (isFinite(K) ? f2(K - st.cfg.ancho, 1) : '—') + ' · auto';
   if (b && u) b.textContent = isFinite(K) ? pct((u.precio - K) / u.precio) : '—';
+  if (d) { const n = diasA(st.f.venc); d.textContent = isFinite(n) ? n + ' días' : '—'; d.className = 'auto' + (isFinite(n) && (n < st.cfg.dteMin || n > st.cfg.dteMax) ? ' c-fail' : ''); }
 }
 function vValidar() {
   if (!st.datos) return '';
-  const t = st.f.t, u = U(t), c = clasificar(u);
-  const tipoTxt = u.tipo === 'Índice' ? 'Reglas de índice · crédito mín. $' + f2(st.cfg.credIdx) : 'Reglas growth · crédito mín. $' + f2(st.cfg.credGro);
-  const stK = num(st.f.strike);
-  const distTxt = isFinite(stK) ? pct((u.precio - stK) / u.precio) : '—';
+  const t = st.f.t, u = U(t), c = st.cfg;
+  const K = num(st.f.strike), n = diasA(st.f.venc), ri = rsiInfo(u.rsi);
+  const e = dia(u.earnings), pf = proximaFed();
   let h = `<div class="row">
-    <div class="col"><div class="eyebrow">Bull Put · Spread $${st.cfg.ancho}</div><h1>Nueva operación</h1></div>
-    <div class="col" style="align-items:flex-end"><div class="lab">Posiciones</div><div class="mono" style="font-size:20px;font-weight:600">${st.cfg.pos}<span style="color:#5C6676">/${st.cfg.maxPos}</span></div></div></div>`;
-  h += `<div style="display:flex;flex-direction:column;gap:10px"><div class="lab" style="font-size:13px;font-weight:500">Subyacente</div>
-    <div class="grid3">${TICKS.map(x => `<button class="pill ${x === t ? 'on' : ''}" onclick="selT('${x}')">${logo(x, 20)}${x}</button>`).join('')}</div>
-    <div class="note">${tipoTxt}</div></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:10px">
-    <div class="row"><span style="font-size:13px;font-weight:600;color:var(--tx2)">Datos automáticos</span><span class="mono" style="font-size:13px;color:var(--mut)">${f2(u.precio)}</span></div>
+    <div class="col"><div class="eyebrow">Bull Put · Spread ${c.ancho} $</div><h1>Nueva operación</h1></div>
+    <div class="col" style="align-items:flex-end"><div class="lab">Riesgo abierto</div><div class="mono c-${nivelRiesgo(riesgoAbierto('Posiciones'))}" style="font-size:18px;font-weight:600">${f2(riesgoAbierto('Posiciones'), 0)} $</div></div></div>`;
+  h += `<div class="stack" style="gap:10px"><div class="lab" style="font-size:13px;font-weight:500">Subyacente</div>
+    <div class="grid3">${TICKS.map(x => `<button class="pill ${x === t ? 'on' : ''}" onclick="selT('${x}')">${logo(x, 20)}${x}</button>`).join('')}</div></div>`;
+  h += `<div class="card stack" style="gap:10px">
+    <div class="row"><span class="ctitle">Datos automáticos</span><span class="mono" style="font-size:13px;color:var(--mut)">${f2(u.precio)}</span></div>
     <div class="grid2" style="gap:8px">
-      <div class="col"><span class="lab">MM21</span><span class="mono">${f2(u.mm21)}</span></div>
-      <div class="col"><span class="lab">MM52</span><span class="mono">${f2(u.mm52)}</span></div>
+      <div class="col"><span class="lab">MM50</span><span class="mono">${f2(u.mm50)}</span></div>
+      <div class="col"><span class="lab">MM200</span><span class="mono">${f2(u.mm200)}</span></div>
+      <div class="col"><span class="lab">HV20</span><span class="mono">${pct(u.hv20)}</span></div>
+      <div class="col"><span class="lab">RSI 14</span><span class="mono c-${ri[1]}">${f2(u.rsi, 0)} · ${ri[0]}</span></div>
       <div class="col"><span class="lab">%K / %D</span><span class="mono">${f2(u.k, 0)} / ${f2(u.d, 0)}</span></div>
-      <div class="col"><span class="lab">Zona strike</span><span class="mono">${c.z ? '≤ ' + f2(c.z.hi, 1) : 'Ninguna'}</span></div>
-      ${ACCIONES.includes(t) ? `<div class="col"><span class="lab">Earnings (hoja)</span><span class="mono">${dia(u.earnings) ? fCorta(dia(u.earnings)) : 'Sin fecha'}</span></div>` : ''}
-      ${proximaFed() ? `<div class="col"><span class="lab">Próxima FED</span><span class="mono">${fCorta(proximaFed().d)}</span></div>` : ''}
-      ${t === 'INTC' ? `<div class="col"><span class="lab">MM 52 semanas</span><span class="mono">${f2(u.mm52semanas)}</span></div>` : ''}
       ${t === 'NVDA' ? `<div class="col"><span class="lab">Retroceso</span><span class="mono">${pct(u.retroceso)}</span></div>` : ''}
-    </div>
-    <div class="chips">${c.ch.map(x => `<span class="chip s-${x[1]}">${esc(x[0])}</span>`).join('')}</div></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Spread</div>
+      ${ACCIONES.includes(t) ? `<div class="col"><span class="lab">Earnings</span><span class="mono">${e ? fCorta(e) : 'Sin fecha'}</span></div>` : ''}
+      ${pf ? `<div class="col"><span class="lab">Próxima FED</span><span class="mono">${fCorta(pf.d)}</span></div>` : ''}
+    </div></div>`;
+  h += `<div class="card stack" style="gap:14px">
+    <div class="ctitle">Spread</div>
     <div class="grid2">
       ${campo('venc', 'Vencimiento', st.f.venc, 'type="date"')}
+      <div class="field"><span class="lab">DTE (${c.dteMin}-${c.dteMax})</span><div class="auto" id="auto_dte">${isFinite(n) ? n + ' días' : '—'}</div></div>
       ${campo('strike', 'Strike vendido', st.f.strike)}
-      <div class="field"><span class="lab">Strike comprado</span><div class="auto" id="auto_comp">${isFinite(stK) ? f2(stK - st.cfg.ancho, 1) : '—'} · auto</div></div>
-      <div class="field"><span class="lab">Distancia</span><div class="auto" id="auto_dist">${distTxt}</div></div>
+      <div class="field"><span class="lab">Strike comprado</span><div class="auto" id="auto_comp">${isFinite(K) ? f2(K - c.ancho, 1) : '—'} · auto</div></div>
       ${campo('credito', 'Crédito ($)', st.f.credito)}
+      <div class="field"><span class="lab">Distancia al precio</span><div class="auto" id="auto_dist">${isFinite(K) ? pct((u.precio - K) / u.precio) : '—'}</div></div>
+      ${campo('delta', 'Delta strike corto', st.f.delta, 'inputmode="decimal" placeholder="0,20"')}
       ${campo('iv', 'IV (%)', st.f.iv)}
-    </div></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Datos manuales</div>
-    <div class="grid2">
-      ${campo('ivr', 'IVR', st.f.ivr)}
-      ${campo('putwall', 'Put wall (OI venc.)', st.f.putwall)}
+      ${campo('putwall', 'Put wall (opcional)', st.f.putwall)}
     </div></div>`;
   h += `<button class="btn pri" onclick="validar()">Validar operación</button>`;
+  setTimeout(updAuto, 0);
   return h;
 }
 
 function validar() {
-  ['venc', 'strike', 'credito', 'iv', 'ivr', 'putwall', 'earn'].forEach(id => { const e = document.getElementById(id); if (e) st.f[id] = e.value; });
+  leerForm();
   const t = st.f.t, u = U(t), c = st.cfg, S = u.precio;
-  const K = num(st.f.strike), cr = num(st.f.credito), iv = num(st.f.iv) / 100, ivr = num(st.f.ivr), pw = num(st.f.putwall);
-  const venc = st.f.venc ? new Date(st.f.venc + 'T16:00:00') : null;
+  const K = num(st.f.strike), cr = num(st.f.credito), iv = num(st.f.iv) / 100, delta = Math.abs(num(st.f.delta)), pw = num(st.f.putwall);
+  const venc = dia(st.f.venc);
   if (!isFinite(K) || !isFinite(cr) || !venc) { toast('Rellena vencimiento, strike y crédito'); return; }
-  const dias = Math.max(1, Math.round((venc - new Date()) / 864e5));
-  const R = [];
+  const dias = diasA(st.f.venc);
+  const R = [], I = [];
   const add = (name, note, value, s) => R.push({ name, note, value, s });
+  const inf = (name, note, value, s) => I.push({ name, note, value, s: s || 'na' });
 
-  add('Tendencia', 'Precio frente a MM52 y MM21',
-    u.tendencia === 'OK' ? 'OK' : u.tendencia === 'AVISO' ? 'Bajo MM21' : 'Bajo MM52',
+  add('Tendencia', 'Cierre ' + f2(u.cierre) + ' · MM50 ' + f2(u.mm50) + ' · MM200 ' + f2(u.mm200),
+    u.tendencia === 'OK' ? 'Sobre MM50' : u.tendencia === 'AVISO' ? 'MM50-MM200' : 'Bajo MM200',
     u.tendencia === 'OK' ? 'ok' : u.tendencia === 'AVISO' ? 'warn' : 'fail');
-  add('Estocástico 10,3,3', '%K ' + f2(u.k, 0) + ' · %D ' + f2(u.d, 0), u.estocasticoOK ? 'Cruce ↑' : 'Sin cruce', u.estocasticoOK ? 'ok' : 'fail');
-  if (t === 'NVDA') add('Pullback', 'Retroceso desde máx. 10 sesiones (mín. 5 %)', pct(u.retroceso), u.pullbackOK ? 'ok' : 'fail');
-  // Strike por debajo de la media más alta (MM21 en tendencia alcista); bajo la MM52 también vale
-  const hiMM = Math.max(u.mm21, u.mm52), bajoMM = K <= hiMM;
-  add('Strike bajo MM21', 'MM21 ' + f2(u.mm21) + ' · MM52 ' + f2(u.mm52),
-    !bajoMM ? 'Encima' : K < Math.min(u.mm21, u.mm52) ? 'Bajo MM52' : 'Entre medias', bajoMM ? 'ok' : 'fail');
-  const dist = (S - K) / S, dmin = c.dist[t] / 100;
-  add('Distancia mínima', 'Mín. ' + f2(c.dist[t], 1) + ' %', pct(dist), dist >= dmin ? 'ok' : 'fail');
-  if (t === 'INTC') add('Bajo MM 52 semanas', 'MM ' + f2(u.mm52semanas), K < u.mm52semanas ? 'Sí' : 'No', K < u.mm52semanas ? 'ok' : 'fail');
-  add('IVR', 'Mínimo ' + c.ivrMin, isFinite(ivr) ? f2(ivr, 0) : 'Sin dato', !isFinite(ivr) ? 'warn' : ivr > c.ivrMin ? 'ok' : 'fail');
-  const cmin = u.tipo === 'Índice' ? c.credIdx : c.credGro;
-  add('Crédito mínimo', 'Mín. $' + f2(cmin), '$' + f2(cr), cr >= cmin ? 'ok' : 'fail');
-  if (isFinite(pw)) add('Put wall (indicador)', 'Put wall ' + f2(pw), K <= pw ? 'Debajo' : 'Encima', K <= pw ? 'ok' : 'warn');
-  else add('Put wall (indicador)', 'Sin dato', '—', 'na');
+  if (t === 'NVDA') add('Pullback NVDA', 'Retroceso desde máx. 10 sesiones (mín. 5 %)', pct(u.retroceso), u.pullbackOK ? 'ok' : 'fail');
+  add('DTE de entrada', 'Entre ' + c.dteMin + ' y ' + c.dteMax + ' días', dias + ' d', dias >= c.dteMin && dias <= c.dteMax ? 'ok' : 'fail');
+  if (!isFinite(delta)) add('Delta strike corto', 'Introduce la delta (máx. ' + f2(c.deltaMax) + ')', '—', 'warn');
+  else add('Delta strike corto', 'Máximo ' + f2(c.deltaMax), '−' + f2(delta), delta <= c.deltaMax ? 'ok' : 'fail');
+  if (!(iv > 0)) add('IV > HV20', 'Introduce la IV · HV20 ' + pct(u.hv20), '—', 'warn');
+  else add('IV > HV20', 'IV ' + pct(iv) + ' · HV20 ' + pct(u.hv20), iv > u.hv20 ? 'Sí' : 'No', iv > u.hv20 ? 'ok' : 'fail');
+  if (t === 'INTC') add('INTC: strike bajo MM200', 'MM200 ' + f2(u.mm200), K < u.mm200 ? 'Sí' : 'No', K < u.mm200 ? 'ok' : 'fail');
   if (ACCIONES.includes(t)) {
-    const e = dia(u.earnings), hoy = new Date();
+    const e = dia(u.earnings);
     if (!e) add('Earnings', 'Sin fecha en la hoja (pestaña Earnings)', '—', 'warn');
     else {
-      const antes = e >= new Date(hoy.toDateString()) && e <= venc;
-      add('Earnings', antes ? 'Caen antes del vencimiento' : 'Fuera del plazo de la operación', e.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }), antes ? 'fail' : 'ok');
+      const dentro = e >= hoyMed() && e <= venc;
+      add('Earnings', dentro ? 'Caen antes del vencimiento' : 'Fuera del plazo de la operación', fDM(e), dentro ? 'fail' : 'ok');
     }
   }
-  // FED: informativo, no cambia el semáforo
-  const hoy0 = new Date(); hoy0.setHours(0, 0, 0, 0);
-  const fedEn = fedFechas().filter(x => x.d >= hoy0 && x.d <= venc);
-  if (!fedFechas().length) add('FED (FOMC)', 'Sin fechas en la hoja (pestaña FED)', '—', 'na');
-  else if (fedEn.length) add('FED (FOMC)', fedEn.length + ' decisión(es) antes del vencimiento' + (fedEn.some(x => x.sep) ? ' · con proyecciones' : ''), fedEn.map(x => x.d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })).join(', '), 'na');
-  else add('FED (FOMC)', 'Ninguna decisión antes del vencimiento', '—', 'ok');
-  add('Posiciones abiertas', 'Máximo ' + c.maxPos, c.pos + ' → ' + (c.pos + 1), c.pos < c.maxPos ? 'ok' : 'fail');
+  const riesgoOp = (c.ancho - cr) * 100, ra = riesgoAbierto('Posiciones'), total = ra + riesgoOp, nr = nivelRiesgo(total);
+  add('Riesgo de cartera', 'Abierto ' + f2(ra, 0) + ' $ + esta ' + f2(riesgoOp, 0) + ' $ · verde ≤ ' + f2(c.riesgoVerde, 0) + ' · máx. ' + f2(c.riesgoMax, 0), f2(total, 0) + ' $', nr);
+  const mismo = abiertas('Posiciones').filter(p => p.vencimiento === st.f.venc).length;
+  add('Mismo vencimiento', 'Máximo ' + c.maxMismoVenc + ' posiciones', mismo + ' → ' + (mismo + 1), mismo + 1 <= c.maxMismoVenc ? 'ok' : 'fail');
 
-  const T = dias / 365;
+  // Informativos (no cambian el semáforo)
+  const m = st.datos.mercado, rm = m ? num(m.ratio) : NaN;
+  if (isFinite(rm)) inf('Mercado VIX/VIX3M', rm > 1 ? 'Backwardation' : 'Contango', f2(rm, 3), rm > 1 ? 'fail' : 'ok');
+  inf('Distancia al precio', 'Strike frente al precio actual', pct((S - K) / S));
+  const ri = rsiInfo(u.rsi);
+  inf('RSI 14', ri[0], f2(u.rsi, 0), ri[1]);
+  inf('Estocástico 10,3,3', '%K ' + f2(u.k, 0) + ' · %D ' + f2(u.d, 0), u.estocasticoOK ? 'Cruce ↑' : 'Sin cruce', u.estocasticoOK ? 'ok' : 'na');
+  if (isFinite(pw)) inf('Put wall', 'Put wall ' + f2(pw), K <= pw ? 'Debajo' : 'Encima', K <= pw ? 'ok' : 'warn');
+  const fedEn = fedFechas().filter(x => x.d >= hoyMed() && x.d <= venc);
+  inf('FED (FOMC)', fedEn.length ? fedEn.length + ' decisión(es) antes del vencimiento' : 'Ninguna antes del vencimiento', fedEn.length ? fedEn.map(x => fDM(x.d)).join(', ') : '—');
+
+  const T = Math.max(dias, 1) / 365;
   let em = NaN, sig = NaN, prob = NaN;
   if (iv > 0) {
     em = S * iv * Math.sqrt(T);
@@ -343,24 +444,27 @@ function validar() {
     prob = ncdf((Math.log(S / K) - 0.5 * iv * iv * T) / (iv * Math.sqrt(T)));
   }
   const nf = R.filter(r => r.s === 'fail').length, nw = R.filter(r => r.s === 'warn').length;
-  st.res = { t, K, cr, dias, venc, R, em, sig, prob, S, nf, nw, nok: R.filter(r => r.s === 'ok').length, estado: nf ? 'rojo' : nw ? 'amarillo' : 'verde' };
-  st.vista = 'res'; render(); window.scrollTo(0, 0);
+  st.res = {
+    t, K, cr, dias, venc: st.f.venc, delta, iv, hv20: u.hv20, R, I, em, sig, prob, S, nf, nw,
+    nok: R.filter(r => r.s === 'ok').length, estado: nf ? 'rojo' : nw ? 'amarillo' : 'verde'
+  };
+  ir('res');
 }
 
 function vRes() {
   const r = st.res, c = st.cfg;
   const E = {
-    verde: ['var(--ok)', '#11241A', 'Verde', 'Valida para entrar', 'Todas las reglas se cumplen.', 'Registrar operación'],
-    amarillo: ['var(--wa)', '#251E0C', 'Amarillo', 'Entrar con reservas', r.nw + ' aviso(s); ninguna regla obligatoria falla.', 'Registrar igualmente'],
-    rojo: ['var(--ko)', '#2A1214', 'Rojo', 'No entrar', r.nf + ' regla(s) no se cumplen.', '']
+    verde: ['var(--ok)', '#11241A', 'Verde', 'Valida para entrar', 'Todas las reglas se cumplen.'],
+    amarillo: ['var(--wa)', '#251E0C', 'Amarillo', 'Entrar con reservas', r.nw + ' aviso(s); ninguna regla obligatoria falla.'],
+    rojo: ['var(--ko)', '#2A1214', 'Rojo', 'No entrar', r.nf + ' regla(s) no se cumplen.']
   }[r.estado];
-  const venc = r.venc.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
   const risk = (c.ancho - r.cr) * 100;
+  const vencD = dia(r.venc);
   let h = `<div style="display:flex;align-items:center;gap:12px">
     <button class="ibtn" aria-label="Volver" onclick="ir('validar')">${ICON.back}</button>
     ${logo(r.t, 36)}
     <div class="col"><div class="mono" style="font-size:17px;font-weight:600">${r.t} ${f2(r.K, 1)}/${f2(r.K - c.ancho, 1)} P</div>
-    <div class="lab">${venc} · ${r.dias} días · crédito $${f2(r.cr)}</div></div></div>`;
+    <div class="lab">${fDM(vencD)} · ${r.dias} días · crédito ${f2(r.cr)} $</div></div></div>`;
   h += `<div style="background:${E[1]};border:1.5px solid ${E[0]};border-radius:20px;padding:20px;display:flex;align-items:center;gap:20px">
     <div class="lights">
       <div class="light" style="${r.estado === 'rojo' ? 'background:#E5484D' : ''}"></div>
@@ -373,13 +477,31 @@ function vRes() {
       <div style="font-size:14px;color:var(--tx2);line-height:1.4">${E[4]}</div>
     </div></div>`;
   h += `<div class="grid2" style="gap:10px">
-    <div class="stat"><span class="lab">Beneficio máx.</span><span class="v">$${f2(r.cr * 100, 0)}</span></div>
-    <div class="stat"><span class="lab">Riesgo máx.</span><span class="v">$${f2(risk, 0)}</span></div>
+    <div class="stat"><span class="lab">Beneficio máx.</span><span class="v">${usd(r.cr * 100)}</span></div>
+    <div class="stat"><span class="lab">Riesgo máx.</span><span class="v">${usd(risk)}</span></div>
     <div class="stat"><span class="lab">Break-even</span><span class="v">${f2(r.K - r.cr)}</span></div>
     <div class="stat"><span class="lab">Retorno / riesgo</span><span class="v">${pct(r.cr * 100 / risk)}</span></div></div>`;
+  const regla = (x, extra) => `<div class="rule">
+      <div class="dot s-${x.s}">${ICON[x.s]}</div>
+      <div class="col" style="flex:1;min-width:0"><span style="font-size:14px">${esc(x.name)}</span><span class="note">${esc(x.note)}</span></div>
+      <span class="mono c-${x.s}" style="font-size:13px;text-align:right">${esc(x.value)}</span></div>`;
+  h += `<div class="row" style="align-items:baseline"><h2 style="color:var(--tx2);text-transform:none;letter-spacing:0;font-size:15px">Reglas</h2><span class="mono" style="font-size:13px;color:var(--mut)">${r.nok} / ${r.R.length} OK</span></div>`;
+  h += `<div class="card" style="padding:4px 14px">${r.R.map(x => regla(x)).join('')}</div>`;
+  // Plan de gestión: precios de recompra para cada salida
+  const stopP = r.cr * (1 + c.stopMult);
+  h += `<div class="card stack" style="gap:4px">
+    <div class="ctitle" style="margin-bottom:4px">Plan de salida</div>
+    <div class="kv"><span>Aviso ${c.benAviso} % beneficio</span><span>recompra a ${f2(r.cr * (1 - c.benAviso / 100))} $</span></div>
+    <div class="kv"><span>Objetivo ${c.benObjetivo} %</span><span class="c-ok">recompra a ${f2(r.cr * (1 - c.benObjetivo / 100))} $</span></div>
+    <div class="kv"><span>Stop (pérdida ${c.stopMult}× crédito)</span><span class="c-fail">recompra a ${f2(stopP)} $ · ${usd(-(stopP - r.cr) * 100)}</span></div>
+    <div class="kv"><span>Aviso ${c.dteAviso} DTE</span><span>${fCorta(sumarDias(r.venc, -c.dteAviso))}</span></div>
+    <div class="kv"><span>Cierre ${c.dteCierre} DTE</span><span>${fCorta(sumarDias(r.venc, -c.dteCierre))}</span></div>
+  </div>`;
+  h += `<div class="row" style="align-items:baseline"><h2 style="color:var(--tx2);text-transform:none;letter-spacing:0;font-size:15px">Información</h2><span class="note">No cambia el semáforo</span></div>`;
+  h += `<div class="card" style="padding:4px 14px">${r.I.map(x => regla(x)).join('')}</div>`;
   if (isFinite(r.em)) {
-    h += `<div class="card" style="display:flex;flex-direction:column;gap:10px">
-      <div class="row"><span style="font-size:13px;font-weight:600;color:var(--tx2)">Movimiento esperado</span><span class="chip s-na">Indicativo</span></div>
+    h += `<div class="card stack" style="gap:10px">
+      <div class="row"><span class="ctitle">Movimiento esperado</span><span class="chip s-na">Indicativo</span></div>
       <div class="grid2" style="gap:10px">
         <div class="col"><span class="lab">±1σ al vencimiento</span><span class="mono">±${f2(r.em)} (${pct(r.em / r.S)})</span></div>
         <div class="col"><span class="lab">Rango 1σ</span><span class="mono">${f2(r.S - r.em, 1)} – ${f2(r.S + r.em, 1)}</span></div>
@@ -387,68 +509,183 @@ function vRes() {
         <div class="col"><span class="lab">Prob. acabar por encima</span><span class="mono">≈ ${pct(r.prob, 0)}</span></div>
       </div></div>`;
   }
-  h += `<div class="row" style="align-items:baseline"><h2 style="color:var(--tx2);text-transform:none;letter-spacing:0;font-size:15px">Reglas</h2><span class="mono" style="font-size:13px;color:var(--mut)">${r.nok} / ${r.R.length} OK</span></div>`;
-  h += `<div class="card" style="padding:4px 14px">` + r.R.map(x => `<div class="rule">
-      <div class="dot s-${x.s}">${ICON[x.s]}</div>
-      <div class="col" style="flex:1;min-width:0"><span style="font-size:14px">${esc(x.name)}</span><span class="note">${esc(x.note)}</span></div>
-      <span class="mono" style="font-size:13px;text-align:right;color:${x.s === 'fail' ? 'var(--ko)' : x.s === 'warn' ? 'var(--wa)' : 'var(--tx2)'}">${esc(x.value)}</span></div>`).join('') + '</div>';
   h += `<div class="grid2" style="gap:10px">
-    <button class="btn sec" onclick="ir('validar')">Editar datos</button>
-    ${E[5] ? `<button class="btn" style="background:${E[0]};color:#0B0E12" onclick="registrar()">${E[5]}</button>` : `<button class="btn sec" onclick="ir('radar')">Volver al radar</button>`}
-  </div>`;
+    <button class="btn ${r.estado === 'rojo' ? 'sec' : 'pri'}" onclick="abrirReg('Posiciones')">Registrar real</button>
+    <button class="btn sec" onclick="abrirReg('Demo')">Registrar demo</button>
+  </div>
+  <button class="btn sec sm" onclick="ir('validar')">Editar datos</button>`;
   return h;
 }
 
+// ---------- registrar (real o demo) ----------
+function abrirReg(hoja) {
+  const r = st.res;
+  st.reg = {
+    hoja, ticker: r.t, vencimiento: r.venc, strikeVendido: r.K, strikeComprado: r.K - st.cfg.ancho,
+    credito: r.cr, contratos: 1, fechaEntrada: hoyISO(), delta: isFinite(r.delta) ? r.delta : '',
+    iv: r.iv > 0 ? +(r.iv * 100).toFixed(2) : '', hv20: isFinite(r.hv20) ? +(r.hv20 * 100).toFixed(2) : '',
+    semaforo: r.estado, notas: ''
+  };
+  ir('reg');
+}
+const REG_IDS = ['fechaEntrada', 'vencimiento', 'strikeVendido', 'strikeComprado', 'credito', 'contratos', 'delta', 'iv', 'notas'];
+function vReg() {
+  const g = st.reg, demo = g.hoja === 'Demo';
+  const inp = (id, lab, extra) => `<div class="field"><label for="r_${id}">${lab}</label><input id="r_${id}" ${extra || 'inputmode="decimal"'} value="${esc(g[id])}"></div>`;
+  let h = `<div style="display:flex;align-items:center;gap:12px">
+    <button class="ibtn" aria-label="Volver" onclick="ir('res')">${ICON.back}</button>
+    ${logo(g.ticker, 36)}
+    <div class="col"><div class="eyebrow">${demo ? 'Operación demo' : 'Operación real'}</div><h1 style="font-size:22px">${esc(g.ticker)} · registrar</h1></div></div>`;
+  h += `<div class="note">${demo ? 'Va a la pestaña Demo. No cuenta para el riesgo de cartera.' : 'Va a la pestaña Posiciones y suma al riesgo de cartera.'} Revisa el crédito real ejecutado.</div>`;
+  h += `<div class="card stack" style="gap:14px"><div class="grid2">
+    ${inp('credito', 'Crédito real ejecutado ($)')}
+    ${inp('contratos', 'Contratos', 'inputmode="numeric"')}
+    ${inp('fechaEntrada', 'Fecha de entrada', 'type="date"')}
+    ${inp('vencimiento', 'Vencimiento', 'type="date"')}
+    ${inp('strikeVendido', 'Strike vendido')}
+    ${inp('strikeComprado', 'Strike comprado')}
+    ${inp('delta', 'Delta corto')}
+    ${inp('iv', 'IV (%)')}
+  </div>
+  <div class="field"><label for="r_notas">Notas (opcional)</label><input id="r_notas" type="text" style="font-family:'IBM Plex Sans',sans-serif" value="${esc(g.notas)}"></div>
+  <div class="row note"><span>HV20 ${f2(num(g.hv20), 1)} % · semáforo ${esc(g.semaforo)}</span></div>
+  </div>`;
+  h += `<button class="btn pri" ${st.enviando ? 'disabled' : ''} onclick="guardarReg()">${st.enviando ? 'Guardando…' : 'Guardar en ' + g.hoja}</button>`;
+  return h;
+}
+function guardarReg() {
+  const g = st.reg;
+  REG_IDS.forEach(id => { const e = document.getElementById('r_' + id); if (e) g[id] = e.value; });
+  if (!(num(g.credito) > 0) || !(num(g.strikeVendido) > num(g.strikeComprado))) { toast('Revisa crédito y strikes'); return; }
+  const datos = Object.assign({}, g); delete datos.hoja;
+  enviar({ accion: 'registrar', hoja: g.hoja, datos }, 'Registrada en ' + g.hoja, () => { st.hoja = g.hoja; st.vista = 'pos'; });
+}
+
+// ---------- posiciones ----------
+function vPos() {
+  if (!st.datos) return '';
+  const c = st.cfg, hoja = st.hoja, demo = hoja === 'Demo';
+  const ab = abiertas(hoja), ce = cerradas(hoja).slice().reverse();
+  const ra = riesgoAbierto(hoja), nr = nivelRiesgo(ra);
+  let h = `<div class="row" style="align-items:flex-end"><div class="col"><div class="eyebrow">Gestión</div><h1>Posiciones</h1></div>
+    <button class="ibtn" aria-label="Actualizar" onclick="cargar()">${ICON.reload}</button></div>`;
+  h += `<div class="seg"><button class="${!demo ? 'on' : ''}" onclick="st.hoja='Posiciones';st.accion=null;render()">Reales</button><button class="${demo ? 'on' : ''}" onclick="st.hoja='Demo';st.accion=null;render()">Demo</button></div>`;
+  const w = Math.min(100, ra / c.riesgoMax * 100), mark = c.riesgoVerde / c.riesgoMax * 100;
+  h += `<div class="card stack" style="gap:8px">
+    <div class="row"><span class="ctitle">Riesgo abierto${demo ? ' (demo)' : ''}</span><span class="mono c-${demo ? 'na' : nr}" style="font-weight:600">${f2(ra, 0)} / ${f2(c.riesgoMax, 0)} $</span></div>
+    <div class="bar"><span style="width:${w}%;background:var(--${demo ? 'acc' : nr === 'ok' ? 'ok' : nr === 'warn' ? 'wa' : 'ko'})"></span><i style="left:${mark}%"></i></div>
+    <div class="note">${ab.length} abierta(s) · ${pct(ra / c.cuenta, 0)} de la cuenta de ${f2(c.cuenta, 0)} $${demo ? ' · no cuenta para el semáforo' : ''}</div></div>`;
+  if (!ab.length) h += `<div class="card note">No hay posiciones abiertas${demo ? ' en demo' : ''}. Se añaden desde Validar → Registrar.</div>`;
+  ab.sort((a, b) => (a.vencimiento > b.vencimiento ? 1 : -1)).forEach(p => { h += tarjetaPos(p, hoja); });
+  if (ce.length) {
+    const tot = ce.reduce((s, p) => s + (num(p.resultado) || 0), 0), gan = ce.filter(p => num(p.resultado) > 0).length;
+    h += `<div class="row" style="align-items:baseline"><h2 style="color:var(--tx2);text-transform:none;letter-spacing:0;font-size:15px">Cerradas</h2>
+      <span class="mono ${tot >= 0 ? 'c-ok' : 'c-fail'}" style="font-size:14px">${usd(tot)} · ${gan}/${ce.length} ganadoras</span></div>`;
+    h += `<div class="card" style="padding:4px 14px">` + ce.map(p => `<div class="kv">
+      <span><span class="mono">${esc(p.ticker)} ${f2(num(p.strikeVendido), 0)}/${f2(num(p.strikeComprado), 0)}</span> <span class="note">${dia(p.fechaCierre) ? fDM(dia(p.fechaCierre)) : ''} · ${esc(MOTIVOS[p.motivo] || p.motivo)}</span></span>
+      <span class="${num(p.resultado) >= 0 ? 'c-ok' : 'c-fail'}">${usd(num(p.resultado))}</span></div>`).join('') + '</div>';
+  }
+  return h;
+}
+function tarjetaPos(p, hoja) {
+  const c = st.cfg, g = gestion(p), u = U(p.ticker), K = num(p.strikeVendido), cr = num(p.credito), ct = num(p.contratos) || 1;
+  const pa = num(p.precioActual), colchon = u && isFinite(K) ? (u.precio - K) / u.precio : NaN;
+  const ac = st.accion && st.accion.id === p.id ? st.accion.tipo : '';
+  let h = `<div class="card stack" style="gap:10px;${g.urg ? 'border-color:#4F2226' : ''}">
+    <div class="row">
+      <div style="display:flex;align-items:center;gap:10px">${logo(p.ticker, 32)}
+        <div class="col"><span class="mono" style="font-size:16px;font-weight:600">${esc(p.ticker)} ${f2(K, 1)}/${f2(num(p.strikeComprado), 1)} P</span>
+        <span class="lab">${dia(p.vencimiento) ? fDM(dia(p.vencimiento)) : '—'} · ${isFinite(g.dte) ? g.dte + ' DTE' : ''} · ${ct} × ${f2(cr)} $</span></div></div>
+      <div class="col" style="align-items:flex-end"><span class="lab">Resultado</span>
+        <span class="mono ${isFinite(g.ben) ? (g.ben >= 0 ? 'c-ok' : 'c-fail') : 'c-na'}" style="font-weight:600">${isFinite(g.ben) ? f2(g.ben * 100, 0) + ' %' : '—'}</span></div>
+    </div>
+    <div class="chips">${g.al.map(x => `<span class="chip s-${x[1]}">${esc(x[0])}</span>`).join('')}</div>
+    <div class="grid2" style="gap:8px">
+      <div class="col"><span class="lab">Subyacente / colchón</span><span class="mono">${u ? f2(u.precio) : '—'} · <span class="${colchon > 0 ? 'c-na' : 'c-fail'}">${pct(colchon)}</span></span></div>
+      <div class="col"><span class="lab">Precio spread${p.fechaPrecio ? ' (' + fDM(dia(p.fechaPrecio)) + ')' : ''}</span><span class="mono">${isFinite(pa) ? f2(pa) + ' $ · ' + usd((cr - pa) * 100 * ct) : 'Sin actualizar'}</span></div>
+      <div class="col"><span class="lab">Objetivo ${c.benObjetivo} %</span><span class="mono c-ok">${f2(cr * (1 - c.benObjetivo / 100))} $</span></div>
+      <div class="col"><span class="lab">Stop</span><span class="mono c-fail">${f2(cr * (1 + c.stopMult))} $</span></div>
+    </div>`;
+  if (ac === 'actualizar') {
+    h += `<div class="stack" style="gap:10px;border-top:1px solid var(--line);padding-top:12px">
+      <div class="field"><label for="a_precio">Precio actual del spread ($, de IBKR)</label><input id="a_precio" inputmode="decimal" value="${isFinite(pa) ? esc(pa) : ''}"></div>
+      <div class="grid2" style="gap:10px"><button class="btn sec sm" onclick="st.accion=null;render()">Cancelar</button>
+      <button class="btn pri sm" ${st.enviando ? 'disabled' : ''} onclick="guardarPrecio('${esc(p.id)}','${hoja}')">Guardar</button></div></div>`;
+  } else if (ac === 'cerrar') {
+    const sug = g.al.some(a => a[0].startsWith('Stop')) ? 'stop' : g.al.some(a => a[0].startsWith('Objetivo')) ? 'objetivo' : g.al.some(a => a[0].includes('DTE: cerrar')) ? 'tiempo' : 'manual';
+    h += `<div class="stack" style="gap:10px;border-top:1px solid var(--line);padding-top:12px">
+      <div class="grid2">
+        <div class="field"><label for="c_precio">Precio de salida ($)</label><input id="c_precio" inputmode="decimal" value="${isFinite(pa) ? esc(pa) : ''}"></div>
+        <div class="field"><label for="c_motivo">Motivo</label><select id="c_motivo">${Object.keys(MOTIVOS).map(k => `<option value="${k}" ${k === sug ? 'selected' : ''}>${MOTIVOS[k]}</option>`).join('')}</select></div>
+        <div class="field"><label for="c_fecha">Fecha de cierre</label><input id="c_fecha" type="date" value="${hoyISO()}"></div>
+      </div>
+      <div class="note">Vencida sin valor: precio de salida 0.</div>
+      <div class="grid2" style="gap:10px"><button class="btn sec sm" onclick="st.accion=null;render()">Cancelar</button>
+      <button class="btn sm" style="background:var(--ko);color:#1A0507" ${st.enviando ? 'disabled' : ''} onclick="cerrarPos('${esc(p.id)}','${hoja}')">Cerrar posición</button></div></div>`;
+  } else {
+    h += `<div class="grid2" style="gap:10px">
+      <button class="btn sec sm" onclick="st.accion={id:'${esc(p.id)}',tipo:'actualizar'};render()">Actualizar precio</button>
+      <button class="btn sec sm" onclick="st.accion={id:'${esc(p.id)}',tipo:'cerrar'};render()">Cerrar</button></div>`;
+  }
+  return h + '</div>';
+}
+function guardarPrecio(id, hoja) {
+  const v = num(document.getElementById('a_precio').value);
+  if (!(v >= 0)) { toast('Precio no válido'); return; }
+  enviar({ accion: 'actualizar', hoja, id, precio: v }, 'Precio actualizado', () => { st.accion = null; });
+}
+function cerrarPos(id, hoja) {
+  const v = num(document.getElementById('c_precio').value);
+  if (!(v >= 0)) { toast('Precio de salida no válido'); return; }
+  enviar({ accion: 'cerrar', hoja, id, precio: v, motivo: document.getElementById('c_motivo').value, fecha: document.getElementById('c_fecha').value },
+    'Posición cerrada', () => { st.accion = null; });
+}
+
+// ---------- ajustes ----------
 function vAjustes() {
   const c = st.cfg;
-  const inp = (path, lab, val) => `<div class="field"><label for="a_${path}">${lab}</label><input id="a_${path}" inputmode="decimal" value="${esc(val)}" onchange="setCfg('${path}',this.value)"></div>`;
+  const inp = (path, lab) => `<div class="field"><label for="a_${path}">${lab}</label><input id="a_${path}" inputmode="decimal" value="${esc(c[path])}" onchange="setCfg('${path}',this.value)"></div>`;
+  const bloque = (titulo, campos) => `<div class="card stack" style="gap:14px"><div class="ctitle">${titulo}</div><div class="grid2">${campos}</div></div>`;
   let h = `<div class="col"><div class="eyebrow">Configuración</div><h1>Ajustes</h1></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Conexión con la hoja</div>
+  h += `<div class="card stack" style="gap:14px">
+    <div class="ctitle">Conexión con la hoja</div>
     ${!c.url || !c.clave ? '<div class="note">Pega la URL de la aplicación web (la que termina en /exec) y tu clave.</div>' : ''}
-    ${st.error ? `<div class="note" style="color:var(--ko)">${esc(st.error)}</div>` : ''}
+    ${st.error ? `<div class="note c-fail">${esc(st.error)}</div>` : ''}
     <div class="field"><label for="a_url">URL de la hoja</label><input id="a_url" type="url" autocapitalize="off" autocorrect="off" value="${esc(c.url)}" onchange="setTxt('url',this.value)" style="font-size:13px"></div>
     <div class="field"><label for="a_clave">Clave</label><input id="a_clave" type="password" autocapitalize="off" autocorrect="off" value="${esc(c.clave)}" onchange="setTxt('clave',this.value)"></div>
     <button class="btn sec" onclick="setTxt('url',document.getElementById('a_url').value);setTxt('clave',document.getElementById('a_clave').value);guardarYCargar()">Guardar y cargar datos</button></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Posiciones</div>
-    <div class="grid2">${inp('pos', 'Abiertas ahora', c.pos)}${inp('maxPos', 'Máximo', c.maxPos)}</div></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Distancia mínima del strike (%)</div>
-    <div class="grid3" style="gap:12px">${TICKS.map(t => inp('dist.' + t, t, c.dist[t])).join('')}</div></div>`;
-  h += `<div class="card" style="display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:13px;font-weight:600;color:var(--tx2)">Reglas generales</div>
-    <div class="grid2">${inp('credIdx', 'Crédito mín. índices ($)', c.credIdx)}${inp('credGro', 'Crédito mín. growth ($)', c.credGro)}${inp('ivrMin', 'IVR mínimo', c.ivrMin)}${inp('ancho', 'Ancho del spread ($)', c.ancho)}</div></div>`;
+  h += bloque('Cuenta y riesgo', inp('cuenta', 'Tamaño de la cuenta ($)') + inp('maxMismoVenc', 'Máx. mismo vencimiento') + inp('riesgoVerde', 'Riesgo verde hasta ($)') + inp('riesgoMax', 'Riesgo máximo ($)'));
+  h += bloque('Entrada', inp('dteMin', 'DTE mínimo') + inp('dteMax', 'DTE máximo') + inp('deltaMax', 'Delta máx. strike corto') + inp('ancho', 'Ancho del spread ($)'));
+  h += bloque('Gestión', inp('benAviso', 'Aviso de beneficio (%)') + inp('benObjetivo', 'Objetivo de beneficio (%)') + inp('dteAviso', 'Aviso por tiempo (DTE)') + inp('dteCierre', 'Cierre por tiempo (DTE)') + inp('stopMult', 'Stop: pérdida = N × crédito'));
   h += `<button class="btn pri" onclick="guardarCfg()">Guardar ajustes</button>`;
   return h;
 }
 
-// ---------- acciones ----------
-function setCfg(path, v) {
-  const n = num(v); if (!isFinite(n)) return;
-  if (path.startsWith('dist.')) st.cfg.dist[path.slice(5)] = n; else st.cfg[path] = n;
-}
+// ---------- navegación ----------
+function setCfg(path, v) { const n = num(v); if (isFinite(n)) st.cfg[path] = n; }
 function selT(t) {
-  ['venc', 'strike', 'credito', 'iv', 'ivr', 'putwall', 'earn'].forEach(id => { const e = document.getElementById(id); if (e) st.f[id] = e.value; });
-  if (st.f.t !== t) { st.f = { t: t, venc: st.f.venc }; }
+  leerForm();
+  if (st.f.t !== t) st.f = { t, venc: st.f.venc };
   render();
 }
-function abrir(t) { st.f = { t: t, venc: st.f.venc }; ir('validar'); }
-function ir(v) { st.vista = v; render(); window.scrollTo(0, 0); }
-function registrar() {
-  st.cfg.pos += 1; guardarCfg('Operación registrada · ' + st.cfg.pos + '/' + st.cfg.maxPos);
-  ir('radar');
-}
+function abrir(t) { leerForm(); st.f = { t, venc: st.f.venc }; ir('validar'); }
+function ir(v) { if (st.vista === 'validar') leerForm(); st.vista = v; st.accion = null; render(); window.scrollTo(0, 0); }
 
 function render() {
   let body;
-  if (st.vista === 'ajustes') body = vAjustes();
+  const v = st.vista;
+  if (v === 'ajustes') body = vAjustes();
   else if (st.cargando && !st.datos) body = '<div class="center">Cargando datos…</div>';
-  else if (!st.datos) body = `<div class="center err">No se pudieron cargar los datos.<br><span class="note">${esc(st.error || 'Configura la conexión en Ajustes.')}</span><br><br><button class="btn sec" onclick="cargar()">Reintentar</button></div>`;
-  else body = st.vista === 'radar' ? vRadar() : st.vista === 'validar' ? vValidar() : vRes();
-  const tab = (v, ic, lab) => `<button class="${st.vista === v || (v === 'validar' && st.vista === 'res') ? 'on' : ''}" onclick="ir('${v}')">${ic}<span>${lab}</span></button>`;
+  else if (!st.datos) body = `<div class="center">No se pudieron cargar los datos.<br><span class="note">${esc(st.error || 'Configura la conexión en Ajustes.')}</span><br><br><button class="btn sec" onclick="cargar()">Reintentar</button></div>`;
+  else if (v === 'validar') body = vValidar();
+  else if (v === 'res' && st.res) body = vRes();
+  else if (v === 'reg' && st.reg) body = vReg();
+  else if (v === 'pos') body = vPos();
+  else body = vRadar();
+  const nu = st.datos ? urgentes() : 0;
+  const tab = (id, ic, lab, on, badge) => `<button class="${on ? 'on' : ''}" onclick="ir('${id}')">${ic}<span>${lab}</span>${badge ? `<span class="badge">${badge}</span>` : ''}</button>`;
   document.getElementById('app').innerHTML = `<div class="wrap">${body}</div>
-    <nav class="tabs">${tab('radar', ICON.radar, 'Radar')}${tab('validar', ICON.check, 'Validar')}${tab('ajustes', ICON.gear, 'Ajustes')}</nav>`;
+    <nav class="tabs">${tab('radar', ICON.radar, 'Radar', v === 'radar')}${tab('validar', ICON.check, 'Validar', ['validar', 'res', 'reg'].includes(v))}${tab('pos', ICON.pos, 'Posiciones', v === 'pos', nu)}${tab('ajustes', ICON.gear, 'Ajustes', v === 'ajustes')}</nav>`;
 }
 
 cargarCfg();
